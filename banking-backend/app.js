@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const moment = require('moment');
 require('express-async-error');
 
 const app = express();
@@ -9,7 +10,8 @@ app.use(express.json());
 
 app.get('/', function(req, res){
     res.json({
-        msg: 'hello from nodejs'
+        msg: 'hello from nodejs',
+        now: moment().valueOf()
     });
 })
 
