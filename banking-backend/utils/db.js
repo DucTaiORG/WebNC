@@ -14,4 +14,5 @@ const pool_query = promisify(pool.query).bind(pool);
 
 module.exports = {
     load: sql => pool_query(sql),
+    update: (soDu, soTaiKhoan) => pool_query(`update taikhoanthanhtoan set SoDu = ${soDu} where SoTaiKhoan = ${soTaiKhoan}`) 
 };
