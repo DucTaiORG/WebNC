@@ -14,7 +14,14 @@ router.get('/', async (req, res) => {
 })
 
 router.put('/update', async(req, res) => {
-    const result = await nopTienModel.update(req.body[SoDu], req.body[SoTaiKhoan]);
+    console.log(req.body.SoDu);
+    if(isNaN(req.body.SoTaiKhoan)){
+        return res.status(400).json({
+            err: 'Invalid STK'
+        });
+    }
+    
+    const result = await nopTienModel.update(req.body.SoDu, req.body.SoTaiKhoan);
     res.status(201).json(result);
 })
 
