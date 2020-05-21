@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const router = express.Router();
 
 const secretKey = "NganHangB";
+const passphrase = "nhom34"; 
 router.get('/', async (req, res) => {
     const list = await nopTienModel.all();
     console.log(list);
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 })
 
 router.put('/update', async(req, res) => {
-    console.log(req.body.SoDu);
+    console.log(req.body);
     if(isNaN(req.body.SoTaiKhoan)){
         return res.status(400).json({
             err: 'Invalid STK'
