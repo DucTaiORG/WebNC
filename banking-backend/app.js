@@ -23,17 +23,20 @@ app.get('/', function(req, res){
      
         const { keys: [privateKey] } =  await openpgp.key.readArmored(privateKeyArmored);
         await privateKey.decrypt(passphrase);
-     
-        const { data: cleartext } = await openpgp.sign({
+
+        const {signature} = await openpgp.sign({
             message: openpgp.cleartext.fromText('Hello, World!'), // CleartextMessage or Message object
-            privateKeys: [privateKey]                             // for signing
+            privateKeys: [privateKey],                            // for signing
+            detached: true
         });
-        console.log(cleartext); // '-----BEGIN PGP SIGNED MESSAGE ... END PGP SIGNATURE-----'
-     
+        console.log(signature);
+
         const verified = await openpgp.verify({
-            message: await openpgp.cleartext.readArmored(cleartext),           // parse armored message
+            message: openpgp.cleartext.fromText('Hello, World!'),              // CleartextMessage or Message object
+            signature: await openpgp.signature.readArmored(signature), // parse detached signature
             publicKeys: (await openpgp.key.readArmored(publicKeyArmored)).keys // for verification
         });
+
         const { valid } = verified.signatures[0];
         if (valid) {
             console.log('signed by key id ' + verified.signatures[0].keyid.toHex());
