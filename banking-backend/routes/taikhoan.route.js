@@ -31,6 +31,7 @@ router.get('/:id', async (req, res) => {
     }
 
     const headerSig = req.headers['sig'] || 0;
+    
     const sig = crypto.createHash('sha256').update(ts + secretKey).digest('hex');
     if(sig !== headerSig){
         const error = 'Goi tin da bi chinh sua';

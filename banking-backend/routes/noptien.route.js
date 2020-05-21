@@ -9,20 +9,23 @@ const router = express.Router();
 const secretKey = "NganHangB";
 const passphrase = "nhom34"; 
 router.get('/', async (req, res) => {
-    const list = await nopTienModel.all();
+    const list = await nopTienModel.getSoDu(req.body.SoTaiKhoan);
     console.log(list);
-    res.json(list);
+    var sodu = Number(list[0].SoDu);
+    res.json(sodu);
 })
 
 router.put('/update', async(req, res) => {
-    console.log(req.body);
+    console.log(req.body.SoDu);
+    const list = await nopTienModel.getSoDu(req.body.SoTaiKhoan);
+    var sodu = Number(list[0].SoDu);
     if(isNaN(req.body.SoTaiKhoan)){
         return res.status(400).json({
             err: 'Invalid STK'
         });
     }
     
-    const result = await nopTienModel.update(req.body.SoDu, req.body.SoTaiKhoan);
+    const result = await nopTienModel.update(Number(req.body.SoDu) + sodu, req.body.SoTaiKhoan);
     res.status(201).json(result);
 })
 
