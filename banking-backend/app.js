@@ -18,22 +18,22 @@ app.get('/', function(req, res){
 
     (async () => {
         const privateKeyArmored =  config.privatePGPArmored; // encrypted private key
+        console.log(privateKeyArmored);
+        
         const publicKeyArmored = config.publicPGPArmored;
         const passphrase = config.passpharse; // what the private key is encrypted with
      
         const { keys: [privateKey] } =  await openpgp.key.readArmored(privateKeyArmored);
         await privateKey.decrypt(passphrase);
 
-        const {signature} = await openpgp.sign({
+        const { data: cleartext } = await openpgp.sign({
             message: openpgp.cleartext.fromText('Hello, World!'), // CleartextMessage or Message object
-            privateKeys: [privateKey],                            // for signing
-            detached: true
+            privateKeys: [privateKey]                             // for signing
         });
-        console.log(signature);
+        console.log(cleartext);
 
         const verified = await openpgp.verify({
-            message: openpgp.cleartext.fromText('Hello, World!'),              // CleartextMessage or Message object
-            signature: await openpgp.signature.readArmored(signature), // parse detached signature
+            message: await openpgp.cleartext.readArmored(cleartext),              // CleartextMessage or Message object
             publicKeys: (await openpgp.key.readArmored(publicKeyArmored)).keys // for verification
         });
 
