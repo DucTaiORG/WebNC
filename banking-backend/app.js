@@ -3,12 +3,14 @@ const morgan = require('morgan');
 const moment = require('moment');
 const openpgp = require('openpgp');
 const config = require('./config/default.json');
+const cors = require('cors');
 require('express-async-error');
 
 const app = express();
 
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(cors());
 
 app.get('/', function(req, res){
     res.json({
@@ -18,8 +20,6 @@ app.get('/', function(req, res){
 
     (async () => {
         const privateKeyArmored =  config.privatePGPArmored; // encrypted private key
-        console.log(privateKeyArmored);
-        
         const publicKeyArmored = config.publicPGPArmored;
         const passphrase = config.passpharse; // what the private key is encrypted with
      
@@ -30,7 +30,6 @@ app.get('/', function(req, res){
             message: openpgp.cleartext.fromText('Hello, World!'), // CleartextMessage or Message object
             privateKeys: [privateKey]                             // for signing
         });
-        console.log(cleartext);
 
         const verified = await openpgp.verify({
             message: await openpgp.cleartext.readArmored(cleartext),              // CleartextMessage or Message object
@@ -56,6 +55,7 @@ app.use((req, res, next) => {
 app.use(function (err, req, res, next) {
     console.log(err.stack);
     res.status(500).send('View error on console log');
+    next();
 })
 
 

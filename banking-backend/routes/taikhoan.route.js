@@ -27,7 +27,7 @@ router.get('/:id', async (req, res) => {
 
     if(currentTime - ts > expireTime){
         const error = 'Loi goi da qua han';
-        return res.json({error});
+        return res.status(203).json({error});
     }
 
     const headerSig = req.headers['sig'] || 0;
@@ -35,13 +35,13 @@ router.get('/:id', async (req, res) => {
     const sig = crypto.createHash('sha256').update(ts + secretKey).digest('hex');
     if(sig !== headerSig){
         const error = 'Goi tin da bi chinh sua';
-        return res.json({error});
+        return res.status(203).json({error});
     }
 
     const code = await authModel.detail(req.headers['bank-code']);
     if(code.length === 0){
         const error = 'Ngan hang chua lien ket';
-        return res.json({error});
+        return res.status(203).json({error});
     }
     const list = await taiKhoanModel.detail(id);
     if(list.length === 0){
