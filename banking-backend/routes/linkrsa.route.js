@@ -44,8 +44,6 @@ router.post('/naptien', async (req, res) => {
             err: 'So tai khoan hoac so tien khong hop le'
         });
     }
-    console.log(JSON.stringify(req.body));
-
     const postBody = {
         sendId: 123456789,
         receivedId: soTaiKhoan,
@@ -54,10 +52,10 @@ router.post('/naptien', async (req, res) => {
 
     const ts = moment().unix();
     const data = JSON.stringify(postBody);
+    console.log(data);
     const sign = crypto.createSign('SHA256');
     sign.update(ts + data);
     const signature = sign.sign(privateKeyRSA, 'hex');
-    console.log(signature);
     const config = {
         headers: {
             "X-BANK": bankCode,
@@ -71,6 +69,7 @@ router.post('/naptien', async (req, res) => {
         console.log(response.data);
         res.json(response.data);
     }).catch(function (error){
+        console.log(error.response.data);
         res.send(error.response.data);
     })
 })

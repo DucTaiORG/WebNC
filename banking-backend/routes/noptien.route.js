@@ -86,11 +86,10 @@ async function signData(data){
 
 async function verifyData(publicKeyArmored, sig){
     const realSignature = sig.split("\\n").join("\n");
-    const realPubKeyArmored = publicKeyArmored.split("\\n").join("\n");
     try {
         const verified = await openpgp.verify({
             message: await openpgp.cleartext.readArmored(realSignature),  // CleartextMessage or Message object
-            publicKeys: (await openpgp.key.readArmored(realPubKeyArmored)).keys // for verification
+            publicKeys: (await openpgp.key.readArmored(publicKeyArmored)).keys // for verification
         });
         const { valid } = verified.signatures[0];
         
