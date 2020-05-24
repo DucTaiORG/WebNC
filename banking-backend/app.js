@@ -1,8 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
 const moment = require('moment');
-const openpgp = require('openpgp');
-const config = require('./config/default.json');
 const cors = require('cors');
 require('express-async-error');
 
@@ -17,36 +15,11 @@ app.get('/', function(req, res){
         msg: 'hello from nodejs',
         now: moment().valueOf()
     });
-
-    (async () => {
-        const privateKeyArmored =  config.privatePGPArmored; // encrypted private key
-        const publicKeyArmored = config.publicPGPArmored;
-        const passphrase = config.passpharse; // what the private key is encrypted with
-     
-        const { keys: [privateKey] } =  await openpgp.key.readArmored(privateKeyArmored);
-        await privateKey.decrypt(passphrase);
-
-        const { data: cleartext } = await openpgp.sign({
-            message: openpgp.cleartext.fromText('Hello, World!'), // CleartextMessage or Message object
-            privateKeys: [privateKey]                             // for signing
-        });
-
-        const verified = await openpgp.verify({
-            message: await openpgp.cleartext.readArmored(cleartext),              // CleartextMessage or Message object
-            publicKeys: (await openpgp.key.readArmored(publicKeyArmored)).keys // for verification
-        });
-
-        const { valid } = verified.signatures[0];
-        if (valid) {
-            console.log('signed by key id ' + verified.signatures[0].keyid.toHex());
-        } else {
-            throw new Error('signature could not be verified');
-        }
-    })();
 })
 
 app.use('/api/taikhoan', require('./routes/taikhoan.route'));
 app.use('/api/noptien', require('./routes/noptien.route'));
+app.use('/client/rsa', require('./routes/linkrsa.route'))
 
 app.use((req, res, next) => {
     res.status(404).send('RESOURCE NOT FOUND!');
@@ -59,7 +32,6 @@ app.use(function (err, req, res, next) {
 })
 
 
-const PORT = 3000;
-app.listen(PORT, _=>{
-    console.log("API is running on port 3000");
+app.listen(process.env.PORT || 8080, _=>{
+    console.log("API is running");
 })
