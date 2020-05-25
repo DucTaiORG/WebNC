@@ -47,20 +47,21 @@ router.post('/naptien', async (req, res) => {
     const postBody = {
         sendId: 123456789,
         receivedId: soTaiKhoan,
-        amount: soTien
+        amount: soTien,
+        reason: "Test"
     }
 
     const ts = moment().unix();
     const data = JSON.stringify(postBody);
     console.log(data);
-    const sign = crypto.createSign('SHA256');
+    const sign = crypto.createSign('SHA1');
     sign.update(ts + data);
-    const signature = sign.sign(privateKeyRSA, 'hex');
+    const signature = sign.sign(privateKeyRSA, 'base64');
     const config = {
         headers: {
             "X-BANK": bankCode,
             "X-TIME": ts,
-            "X-SIGN": signature
+            "X-SIG": signature
         }
     }
     console.log(config);
