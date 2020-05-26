@@ -38,8 +38,9 @@ router.put('/update', async(req, res) => {
         return res.status(203).json({error});
     }
 
+    const body = JSON.stringify(req.body);
     const headerSig = req.headers['sig'] || 0;
-    const sig = crypto.createHash('sha256').update(ts + bankCode[0].secretKey).digest('hex');
+    const sig = crypto.createHash('sha256').update(ts + body + bankCode[0].secretKey).digest('hex');
     if(sig !== headerSig){
         const error = 'Goi tin da bi chinh sua';
         return res.status(203).json({error});

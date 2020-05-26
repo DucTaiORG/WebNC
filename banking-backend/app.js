@@ -19,7 +19,8 @@ app.get('/', function(req, res){
 
 app.use('/api/taikhoan', require('./routes/taikhoan.route'));
 app.use('/api/noptien', require('./routes/noptien.route'));
-app.use('/client/rsa', require('./routes/linkrsa.route'))
+app.use('/client/rsa', require('./routes/linkrsa.route'));
+app.use('/client/pgp', require('./routes/linkpgp.route'));
 
 app.use((req, res, next) => {
     res.status(404).send('RESOURCE NOT FOUND!');
