@@ -1,0 +1,14 @@
+.main-footer{
+    color: white;
+    position: relative;
+    padding-top: 1em;
+    width: 100%;
+}
+
+ul{
+    list-style-type: none;
+}
+
+hr{
+    color: white;
+}
