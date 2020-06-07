@@ -1,14 +1,30 @@
 import React, { Component } from "react";
 
 export default class Login extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            userName: '',
+        }
+    }
+
+    handleSubmit = event => {
+        this.props.submitLogin(this.state.userName);
+    }
+
+    handleInputChange = (e) =>{
+        this.setState({
+            userName: e.target.value
+        })
+    }
     render() {
         return (
-            <form>
+            <form onSubmit={this.handleSubmit}>
                 <h3>Sign In</h3>
 
                 <div className="form-group">
-                    <label>Email address</label>
-                    <input type="email" className="form-control" placeholder="Enter email" />
+                    <label>User name</label>
+                    <input type="text" className="form-control" placeholder="Enter user name" onChange={this.handleInputChange}/>
                 </div>
 
                 <div className="form-group">
