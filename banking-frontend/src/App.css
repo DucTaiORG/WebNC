@@ -1,5 +1,4 @@
 .App-container {
-  width: 100%;
   height: 100vh;
   text-align: center;
   display: flex;
@@ -16,7 +15,6 @@
   flex-direction: row;
   color: white;
   text-justify: auto;
-  width: 100%;
 }
 
 .App-link {
@@ -35,7 +33,6 @@
 h1{
   align-self: center;
   text-align: center;
-  width: 100%;
 }
 
 .body-container {
@@ -51,20 +48,18 @@ h1{
 }
 body {
   background: #1C8EF9 !important;
-  min-height: 100vh;
+  height: 100%;
   font-weight: 400;
   display: flex;
   font-family: 'Fira Sans', sans-serif;
   flex-direction: column;
+  overflow-x: hidden;
+  width: 100vw;
 }
 
 h1,h2,h3,h4,h5,h6,label,span {
   font-weight: 500;
   font-family: 'Fira Sans', sans-serif;
-}
-
-body, html, .App, #root, .auth-wrapper {
-  width: 100%;
 }
 
 .navbar-light {
@@ -78,9 +73,11 @@ body, html, .App, #root, .auth-wrapper {
   margin: 50px 0px 0px 0px;
   position: relative;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   flex: 1;
+  display: flex;
+  flex-direction: row;
 }
 
 .auth-inner {
@@ -125,7 +122,6 @@ body, html, .App, #root, .auth-wrapper {
 .footer-container{
   flex: none; 
   padding: 10px 10px 0px 10px; 
-  width: 100%;
   background-color: #282c34;
 }
 

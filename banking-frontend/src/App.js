@@ -8,7 +8,9 @@ import Login from './components/Login/Login';
 import Footer from './components/Footer/Footer';
 import Admin from './components/Admin/Admin';
 import Employee from './components/Employee/Employee';
-import Customer from './components/Customer/Customer'
+import Customer from './components/Customer/Customer';
+import RouterEmployee from './components/RouterURL/RouterEmployee'
+import { findByLabelText } from '@testing-library/react';
 
 class App extends Component {
   constructor(props){
@@ -74,6 +76,7 @@ class App extends Component {
                   </header>
                   <div className="auth-wrapper" style={{marginTop: 0}}>
                       <Employee/>
+                      <RouterEmployee/>
                   </div>
                   <div className="footer-container">
                   <Footer/>

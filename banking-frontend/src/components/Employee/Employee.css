@@ -1,8 +1,7 @@
 /* The sidebar menu */
 .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 160px; /* Set the width of the sidebar */
-    position: absolute;
+    width: 300px; /* Set the width of the sidebar */
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
     left: 0;
@@ -35,4 +34,19 @@
   @media screen and (max-height: 450px) {
     .sidenav {padding-top: 15px;}
     .sidenav a {font-size: 18px;}
+  }
+
+  hr{
+    border: 0;
+    clear:both;
+    display:block;
+    width: 100%;               
+    background-color:white;
+    height: 1px;
+  }
+
+  .btn-block {
+    display: block;
+    width: 50%;
+    margin: 0 auto;
   }
