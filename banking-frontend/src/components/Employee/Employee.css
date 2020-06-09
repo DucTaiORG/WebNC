@@ -50,3 +50,15 @@
     width: 50%;
     margin: 0 auto;
   }
+
+  [class^="auth-wrapper"]{
+    margin: 0 0 0 0;
+    justify-content: left;
+  }
+
+  [class^="auth-wrapper"]
+
+  .main-content{
+    flex: 1;
+    padding-top: 20px;
+  }

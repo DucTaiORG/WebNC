@@ -2,15 +2,14 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-import {Router, Switch} from 'react-router-dom';
+import {Switch, Route} from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Login from './components/Login/Login';
 import Footer from './components/Footer/Footer';
 import Admin from './components/Admin/Admin';
 import Employee from './components/Employee/Employee';
 import Customer from './components/Customer/Customer';
-import RouterEmployee from './components/RouterURL/RouterEmployee'
-import { findByLabelText } from '@testing-library/react';
+import {ProtectedRoute} from './components/RouterURL/ProtectedRoute';
 
 class App extends Component {
   constructor(props){
@@ -35,7 +34,36 @@ class App extends Component {
   }
 
   render() {
-    switch(this.state.userRole){
+    return(
+      <div className="App-container">
+        <header className="App-header">
+          <img src={logo} alt="logo" width="150" height="150" className="App-logo"/>
+          <h1>Welcome to my bank </h1>
+        </header>
+        <Navigation/>
+        <Switch>
+          <Route exact path="/" component={Login}/>
+          
+          <ProtectedRoute 
+            path="/customer"
+            component={Customer}/>
+          
+          <ProtectedRoute 
+            path="/employee"
+            component={Employee}/>
+          
+          <ProtectedRoute 
+            path="/admin"
+            component={Admin}/>
+
+          <Route path="*" component={()=>"404 NOT FOUND"}/>
+        </Switch>
+        <div className="footer-container">
+          <Footer/>
+        </div>
+      </div>
+    );
+    /*switch(this.state.userRole){
       case 'public':{
         return  <div className="App-container">
                   <header className="App-header">
@@ -98,7 +126,7 @@ class App extends Component {
                   </div>
                 </div>
       }
-    }
+    }*/
   }
 }
 
