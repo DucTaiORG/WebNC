@@ -45,8 +45,7 @@ app.use((req, res, next) => {
 
 app.use(function (err, req, res, next) {
     console.log(err.stack);
-    const statusCode = err.status || 500
-    console.log(statusCode);
+    const statusCode = err.status || 500;
     res.status(statusCode).send('View error on console log');
     next();
 });

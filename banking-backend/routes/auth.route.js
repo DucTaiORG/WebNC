@@ -28,10 +28,10 @@ router.post('/login', async (req, res)=>{
 });
 
 //api reset refresh token
-router.post('/refresh', (req, res) => {
+router.post('/refresh', (req, res, next) => {
     jwt.verify(req.body.accessToken, config.secretKey, {ignoreExpiration: true}, async function(err, payload){
         if(err){
-            throw createError(401, err);
+            next(createError(401, err));
         }
         
         const { userId } = payload;
@@ -41,7 +41,7 @@ router.post('/refresh', (req, res) => {
             return res.json({accessToken});
         }
 
-        throw createError(401, 'Invalid refresh token');
+        next(createError(401, 'Invalid refresh token'));
     });
 });
 

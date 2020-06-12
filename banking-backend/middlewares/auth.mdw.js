@@ -9,13 +9,14 @@ module.exports = {
         if(token){
             jwt.verify(token, config.secretKey, function(err, payload){
                 if(err){
-                    throw createError(401, err);
+                    next(createError(401, err));
+                    return;
                 }
-                    
                 next();
             });
         }else{
-            throw createError(401, 'No access token.');
+            next(createError(401, 'No access token.'));
+            return;
         }
     },
 
@@ -24,21 +25,22 @@ module.exports = {
         if(token){
             jwt.verify(token, config.secretKey, async function(err, payload){
                 if(err){
-                    throw createError(401, err);
+                    next(createError(401, err));
+                    return;
                 }
 
                 const {userId} = payload;
                 const rows = await userModel.singleByUserId(userId);
-                console.log(rows);
-                
                 const userRole = rows[0].userRole;
                 if(userRole !== 2){
-                    throw createError(401, 'Do not allow to access resource');
+                    next(createError(401, 'Do not allow to access resource'));
+                    return;
                 }
                 next();
             });
         }else{
-            throw createError(401, 'No access token.')
+            next(createError(401, 'No access token.'));
+            return;
         }
     }
 }
