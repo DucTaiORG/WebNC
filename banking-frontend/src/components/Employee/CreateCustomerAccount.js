@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import axios from 'axios'
 import './Employee.css';
 
 const formValid = formErrors =>{
@@ -11,15 +12,15 @@ export default class CreateCustomerAccount extends Component{
     constructor(props){
         super(props);
         this.state = {
-            username: null,
-            password: null,
-            customerName: null,
-            phoneNo: null,
+            username: "",
+            password: "",
+            fullname: "",
+            phoneNo: "",
             formErrors:{
                 username: "",
                 password: "",
                 repassword: "",
-                customerName: "",
+                fullname: "",
                 phoneNo: "",
             }
         };
@@ -30,13 +31,29 @@ export default class CreateCustomerAccount extends Component{
         e.preventDefault();
 
         if(formValid(this.state.formErrors)){
-            console.log(`
-            --Submitting
-            Username: ${this.state.username}
-            Password: ${this.state.password}
-            Customer Name: ${this.state.customerName}
-            Phone No: ${this.state.phoneNo}
-            `);
+            const submitForm = this.state;
+            submitForm.userRole = 1;
+            delete submitForm.formErrors;
+            delete submitForm.repassword;
+            axios.post('http://localhost:8080/api/auth/register', submitForm).then(function (response) {
+                console.log(response.data);
+                alert('Register success');
+            }).catch(function (error){
+                console.log(error);
+            });
+            this.setState({
+                username: "",
+                password: "",
+                fullname: "",
+                phoneNo: "",
+                formErrors:{
+                    username: "",
+                    password: "",
+                    repassword: "",
+                    fullname: "",
+                    phoneNo: "",
+                }
+            });
         }else{
             alert('Invalid Information');
         }
@@ -55,10 +72,7 @@ export default class CreateCustomerAccount extends Component{
                     }else{
                         formErrors.username = "";
                     }
-                }else{
-                    console.log(typeof value);
                 }
-                
                 break;
             case "password":
                 if(value != undefined){
@@ -67,27 +81,20 @@ export default class CreateCustomerAccount extends Component{
                     }else{
                         formErrors.password = "";
                     }
-                }else{
-                    console.log(typeof value);
                 }
                 break;
             case "repassword":
-                console.log(value);
-                console.log(this.state.password);
                 if(value != undefined){
                     if(value !== this.state.password){
                         formErrors.repassword = "Repassword not match";
                     }else{
                         formErrors.repassword = "";
                     }
-                }else{
-                    console.log(typeof value);
                 }
-                
                 break;
         }
 
-        this.setState({formErrors, [name]: value}, () => console.log(this.state));
+        this.setState({formErrors, [name]: value});
     }
 
     render(){
@@ -99,30 +106,30 @@ export default class CreateCustomerAccount extends Component{
 
                     <div className="form-group">
                         <label>Account name</label>
-                        <input type="text" name="username" className="form-control" placeholder="Enter user name" onChange={this.handleInputChange}/>
+                        <input type="text" name="username" value={this.state.username} className="form-control" placeholder="Enter user name" onChange={this.handleInputChange}/>
                         {formErrors.username.length > 0 ? <span style={{color: 'red'}}>{formErrors.username}</span>:null}
                     </div>
 
                     <div className="form-group">
                         <label>Password</label>
-                        <input type="password" name="password" className="form-control" placeholder="Enter password" onChange={this.handleInputChange}/>
+                        <input type="password" name="password" value={this.state.password} className="form-control" placeholder="Enter password" onChange={this.handleInputChange}/>
                         {formErrors.password.length > 0 ? <span style={{color: 'red'}}>{formErrors.password}</span>:null}
                     </div>
 
                     <div className="form-group">
                         <label>Re-password</label>
-                        <input type="password" name="repassword" className="form-control" placeholder="Re-enter password" onChange={this.handleInputChange}/>
+                        <input type="password" name="repassword" value={this.state.repassword} className="form-control" placeholder="Re-enter password" onChange={this.handleInputChange}/>
                         {formErrors.repassword.length > 0 ? <span style={{color: 'red'}}>{formErrors.repassword}</span>:null}
                     </div>
 
                     <div className="form-group">
                         <label>Customer name</label>
-                        <input type="text" name="customerName" className="form-control" placeholder="Enter customer name" onChange={this.handleInputChange}/>
+                        <input type="text" name="fullname" value={this.state.fullname} className="form-control" placeholder="Enter customer name" onChange={this.handleInputChange}/>
                     </div>
 
                     <div className="form-group">
                         <label>Phone number</label>
-                        <input type="text" name="phoneNo" className="form-control" placeholder="Enter customer phone number" onChange={this.handleInputChange}/>
+                        <input type="text" name="phoneNo" value={this.state.phoneNo} className="form-control" placeholder="Enter customer phone number" onChange={this.handleInputChange}/>
                     </div>
                     <button className="submit-button" type="submit" className="btn btn-primary btn-block">Submit</button>
                 </form>

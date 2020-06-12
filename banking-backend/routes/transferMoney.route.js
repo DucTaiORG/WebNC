@@ -1,5 +1,5 @@
 const express = require('express');
-const nopTienModel = require('../models/noptien.model');
+const transferModel = require('../models/transferMoney.model');
 const authModel = require('../models/auth.model');
 const moment = require('moment');
 const openpgp = require('openpgp');
@@ -8,18 +8,18 @@ const config = require('../config/default.json');
 
 const router = express.Router();
 router.get('/', async (req, res) => {
-    const list = await nopTienModel.getSoDu(req.body.SoTaiKhoan);
+    const list = await transferModel.getBalance(req.body.accNum);
     console.log(list);
-    var sodu = Number(list[0].SoDu);
-    res.json(sodu);
+    var balance = Number(list[0].balance);
+    res.json(balance);
 })
 
 router.put('/update', async(req, res) => {
-    const soTaiKhoan = +req.body.SoTaiKhoan || -1;
-    const soTien = +req.body.SoTien || -1;
-    if(soTaiKhoan === -1 || soTien === -1){
+    const accNum = +req.body.accNum || -1;
+    const moneyAmount = +req.body.moneyAmount || -1;
+    if(accNum === -1 || moneyAmount === -1){
         return res.status(400).json({
-            err: 'So tai khoan hoac so tien khong hop le'
+            err: 'Invalid accNum or moneyAmount'
         })
     }
 
@@ -28,13 +28,13 @@ router.put('/update', async(req, res) => {
     const expireTime = 600000; // 10 mins
 
     if(currentTime - ts > expireTime){
-        const error = 'Loi goi da qua han';
+        const error = 'Expired request';
         return res.status(203).json({error});
     }
 
     const bankCode = await authModel.detail(req.headers['bank-code']);
     if(bankCode.length === 0){
-        const error = 'Ngan hang chua lien ket';
+        const error = 'Can not identify bank';
         return res.status(203).json({error});
     }
 
@@ -42,19 +42,19 @@ router.put('/update', async(req, res) => {
     const headerSig = req.headers['sig'] || 0;
     const sig = crypto.createHash('sha256').update(ts + body + bankCode[0].secretKey).digest('hex');
     if(sig !== headerSig){
-        const error = 'Goi tin da bi chinh sua';
+        const error = 'Not original request';
         return res.status(203).json({error});
     }
 
-    const list = await nopTienModel.getSoDu(soTaiKhoan);
+    const list = await transferModel.getBalance(accNum);
     if(list.length > 0){
-        const sodu = Number(list[0].SoDu);
+        const balance = Number(list[0].balance);
         const publicKeyArmored = bankCode[0].publicKeyPGP;
         const sigPGP = req.headers['signature-pgp']
         if(await verifyData(publicKeyArmored, sigPGP)){
-            const result = await nopTienModel.update(Number(soTien) + sodu, soTaiKhoan);
+            const result = await transferModel.update(Number(moneyAmount) + balance, accNum);
             const currentTime = moment().valueOf();
-            const data = soTien + ', ' + soTaiKhoan + ', ' + currentTime;
+            const data = moneyAmount + ', ' + accNum + ', ' + currentTime;
             console.log(data);
             const mySig = await signData(data);
             res.status(203).json({
@@ -62,11 +62,11 @@ router.put('/update', async(req, res) => {
                 responseSignature: mySig
             });
         }else{
-            const error = "Verify that bai";
+            const error = "Verify fail";
             res.json({error});
         }
     }else{
-        const error = 'Khong ton tai so tai khoan';
+        const error = 'Account number is not exist';
         return res.json({error});
     }
 })

@@ -3,16 +3,18 @@ const { promisify } = require('util');
 
 const pool = mysql.createPool({
     connectionLimit: 100,
-    host: 'sql12.freemysqlhosting.net',
+    host: 'localhost',
     port: 3306,
-    user: 'sql12342722',
-    password: 'dBMjMZ1JCn',
-    database: 'sql12342722'
+    user: 'root',
+    password: '',
+    database: 'banking'
 });
 
 const pool_query = promisify(pool.query).bind(pool);
 
 module.exports = {
     load: sql => pool_query(sql),
-    update: (soDu, soTaiKhoan) => pool_query(`update taikhoanthanhtoan set SoDu = '${soDu}' where SoTaiKhoan = '${soTaiKhoan}'`) 
+    update: (tableName, column, condition) => pool_query(`update ${tableName} set ? where ?`, [column, condition]),
+    add: (entity, tableName) => pool_query(`insert into ${tableName} set ?`, entity),
+    delete: (tableName, condition) => pool_query(`delete from ${tableName} where ?`, condition)
 };
