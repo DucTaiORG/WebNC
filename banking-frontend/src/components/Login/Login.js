@@ -6,23 +6,22 @@ export default class Login extends Component {
     constructor(props){
         super(props);
         this.state = {
-            userName: '',
-
+            username: '',
+            password: '',
         }
     }
 
     handleSubmitLogin = (event) => { 
         event.preventDefault();
-        Auth.login(this.state.userName, 
+        Auth.login(this.state, 
             ()=>{
+                console.log(`isLogin: ${Auth.isAuthenticated()}`);
                 this.props.history.push(`/${Auth.getUserRole()}`)
             });
     }
 
     handleInputChange = (e) =>{        
-        this.setState({
-            userName: e.target.value
-        })
+        this.setState({[e.target.name]: e.target.value})
     }
     render() {
         return (
@@ -38,7 +37,7 @@ export default class Login extends Component {
 
                         <div className="form-group">
                             <label>Password</label>
-                            <input type="password" name="password" className="form-control" placeholder="Enter password" />
+                            <input type="password" name="password" className="form-control" placeholder="Enter password" onChange={this.handleInputChange}/>
                         </div>
 
                         <div className="form-group">

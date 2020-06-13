@@ -7,7 +7,6 @@ router.post('/', async (req, res) =>{
     const moneyAmount = req.body.moneyAmount || -1;
 
     const ret = await depositModel.depositMoney(accNum, moneyAmount);
-
     if(ret === null){
         const error = "Account number not found";
         return res.status(400).json({error});

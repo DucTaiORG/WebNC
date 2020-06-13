@@ -10,6 +10,7 @@ const createError = require('http-errors');
 
 //Login api 
 router.post('/login', async (req, res)=>{
+    console.log(req.body);
     const ret = await authModel.login(req.body);
     if(ret === null){
         return res.json({
@@ -19,9 +20,11 @@ router.post('/login', async (req, res)=>{
 
     const accessToken = generateAccessToken(ret.id);
     const refreshToken = randToken.generate(80);
+    const userRole = ret.userRole;
     await userModel.updateRefreshToken(ret.id, refreshToken);
     res.json({
         authenticated: true,
+        userRole,
         accessToken,
         refreshToken
     });
@@ -32,6 +35,7 @@ router.post('/refresh', (req, res, next) => {
     jwt.verify(req.body.accessToken, config.secretKey, {ignoreExpiration: true}, async function(err, payload){
         if(err){
             next(createError(401, err));
+            return;
         }
         
         const { userId } = payload;

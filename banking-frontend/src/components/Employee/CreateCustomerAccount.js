@@ -8,6 +8,24 @@ const formValid = formErrors =>{
     return valid;
 }
 
+const refresh = () =>{
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    const postBody = {
+        accessToken,
+        refreshToken
+    }
+
+    axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
+        if(response.data.accessToken){
+            localStorage.setItem('accessToken', response.data.accessToken);
+        }
+    }).catch((error) => {
+        console.log(error.response);
+    })
+}
+
 export default class CreateCustomerAccount extends Component{
     constructor(props){
         super(props);
@@ -35,7 +53,15 @@ export default class CreateCustomerAccount extends Component{
             submitForm.userRole = 1;
             delete submitForm.formErrors;
             delete submitForm.repassword;
-            axios.post('http://localhost:8080/api/auth/register', submitForm).then(function (response) {
+
+            const config = {
+                headers: {
+                    'x-access-token' : localStorage.getItem('accessToken')
+                }
+            }
+            
+            refresh();
+            axios.post('http://localhost:8080/api/user/register', submitForm, config).then(function (response) {
                 console.log(response.data);
                 alert('Register success');
             }).catch(function (error){

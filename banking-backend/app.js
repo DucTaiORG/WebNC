@@ -28,7 +28,7 @@ app.use('/user', verify, require('./routes/users.internal.route'));
 app.use('/deposit', verifyEmployee, require('./routes/deposit.route'));
 
 //api register
-app.use('/user/register', verifyEmployee, async (req, res)=>{
+app.post('/user/register', verifyEmployee, async (req, res)=>{
     const result = await userModel.add(req.body);
     const ret = {
         id: result.insertId,

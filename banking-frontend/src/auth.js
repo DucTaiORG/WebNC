@@ -1,30 +1,39 @@
 /* eslint-disable no-unused-expressions */
+import axios from 'axios';
+
 class Auth{
     constructor(){
         this.authenticated = false,
         this.userRole = ''
     }
-    
-    login(userName, cb){
-        if(userName === 'customer'){
-            this.userRole = 'customer';
-            this.authenticated = true;
-        }
 
-        if(userName === 'employee'){
-            this.userRole = 'employee';
-            this.authenticated = true;
-        }
-        
-        if(userName === 'admin'){
-            this.userRole = 'admin';
-            this.authenticated = true;
-        }
-        cb();
+    login(entity, cb){
+        axios.post('http://localhost:8080/api/auth/login', entity).then((response) => {
+            if(response.data.authenticated === true){
+                localStorage.setItem('accessToken', response.data.accessToken);
+                localStorage.setItem('refreshToken', response.data.refreshToken);
+                this.authenticated = true;
+                const authen = response.data.userRole;
+                if(authen === 1){
+                    this.userRole = 'customer';
+                }
+                if(authen === 2){
+                    this.userRole = 'employee';
+                }
+                if(authen === 3){
+                    this.userRole = 'admin';
+                }
+                cb();
+            }else{
+                alert('Login fail');
+            }
+        }).catch(function(error){
+            console.log(error);
+        });
     }
 
     logout(cb){
-        this.userRole = 0;
+        this.userRole = '';
         this.authenticated = false;
         cb();
     }
