@@ -1,31 +1,12 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 
-const refresh = (cb) =>{
-    const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
-
-    const postBody = {
-        accessToken,
-        refreshToken
-    }
-
-    axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
-        if(response.data.accessToken){
-            localStorage.setItem('accessToken', response.data.accessToken);
-            cb();
-        }
-    }).catch((error) => {
-        console.log(error.response);
-    });
-}
-
 export default class DepositMoney extends Component{
     constructor(props){
         super(props);
         this.state = {
-            accountNumber: "",
-            moneyAmount: "",
+            accountNumber: '',
+            moneyAmount: '',
         }
     }
 
@@ -37,24 +18,37 @@ export default class DepositMoney extends Component{
 
     handleSubmitForm = e => {
         e.preventDefault();
-        const submitForm = this.state;
-        const config = {
-            headers: {
-                'x-access-token' : localStorage.getItem('accessToken')
-            }
+        const state = this.state;
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        const postBody = {
+            accessToken,
+            refreshToken
         }
+        axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
+            if(response.data.accessToken){
+                localStorage.setItem('accessToken', response.data.accessToken);
+                const submitForm = state;
+                const config = {
+                    headers: {
+                        'x-access-token' : localStorage.getItem('accessToken')
+                    }
+                }
 
-        const callDepositApi = axios.post('http://localhost:8080/deposit', submitForm, config).then((response)=>{
-            console.log(response);
-            if(response.data.success){
-                alert('Deposit successful');
+                axios.post('http://localhost:8080/deposit', submitForm, config).then((response)=>{
+                    console.log(response);
+                    if(response.data.success){
+                        alert('Deposit successful');
+                    }
+                }).catch((error)=>{
+                    console.log(error.response);
+                    alert(`Deposit fail: ${error.response.data.error}`);
+                });
             }
-        }).catch((error)=>{
+        }).catch((error) => {
             console.log(error.response);
-            alert(`Deposit fail: ${error.response.statusText}`);
         });
-
-        refresh(callDepositApi);
         
         this.setState({
             accountNumber: "",

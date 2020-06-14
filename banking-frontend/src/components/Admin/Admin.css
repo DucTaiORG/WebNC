@@ -1,0 +1,17 @@
+.management-button{
+    margin-top: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.custom-button{
+    margin-left: 10px;
+}
+
+.admin-content{
+    flex: 1;
+    padding: 20px;
+    height: max-content;
+}

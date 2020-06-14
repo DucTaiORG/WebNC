@@ -1,8 +1,10 @@
 const express = require('express');
 const depositModel = require('../models/deposit.model');
 const router = express.Router();
+const moment = require('moment');
 
 router.post('/', async (req, res) =>{
+    console.log(req.body);
     const accNum = req.body.accountNumber || -1;
     const moneyAmount = req.body.moneyAmount || -1;
 
@@ -24,14 +26,17 @@ router.post('/', async (req, res) =>{
 });
 
 router.post('/history', async (req, res)=>{
+    console.log(req.body);
     const accNum = req.body.accountNumber || -1;
     const ret = await depositModel.getDepositHistory(accNum);
-
     if(ret === null){
         const error = "Account number not found";
         return res.status(400).json({error});
     }
-
+    ret.forEach(element => {
+       element.deposit_time = moment(element.deposit_time).format('HH:mm:ss DD/MM/YYYY'); 
+    });
+    
     return res.json(ret);
 });
 

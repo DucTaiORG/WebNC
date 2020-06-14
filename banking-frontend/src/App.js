@@ -37,7 +37,7 @@ class App extends Component {
     return(
       <div className="App-container">
         <header className="App-header">
-          <img src={logo} alt="logo" width="150" height="150" className="App-logo"/>
+          <img src={logo} alt="logo" width="90" height="90" className="App-logo"/>
           <h1>Welcome to my bank </h1>
         </header>
         <Navigation/>

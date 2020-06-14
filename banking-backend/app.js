@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const moment = require('moment');
 const userModel = require('./models/users.model');
 const cors = require('cors');
-const {verify, verifyEmployee} = require('./middlewares/auth.mdw');
+const {verify, verifyEmployee, verifyAdmin} = require('./middlewares/auth.mdw');
 require('express-async-error');
 
 const app = express();
@@ -26,10 +26,15 @@ app.use('/client/pgp', require('./routes/linkpgp.route'));
 app.use('/api/auth', require('./routes/auth.route'));
 app.use('/user', verify, require('./routes/users.internal.route'));
 app.use('/deposit', verifyEmployee, require('./routes/deposit.route'));
+app.use('/employee', verifyAdmin, require('./routes/employee.route'));
 
 //api register
 app.post('/user/register', verifyEmployee, async (req, res)=>{
     console.log(req.body);
+    const rows = await userModel.singleByUserName(req.body.username);
+    if(rows.length){
+        return res.status(400).json({error: 'Username exist'});
+    }
     const result = await userModel.add(req.body);
     const ret = {
         id: result.insertId,

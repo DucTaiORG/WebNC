@@ -53,7 +53,7 @@ const generateAccessToken = userId => {
     const payload = { userId };
 
     const accessToken = jwt.sign(payload, config.secretKey, {
-        expiresIn: '10m'
+        expiresIn: '5m'
     });
 
     return accessToken;
