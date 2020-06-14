@@ -57,5 +57,15 @@ module.exports = {
 
     singleByUserId: userId => {
         return db.load(`select * from users where id = ${userId}`);
+    },
+
+    addToDepositHistory: async (accNum, moneyAmount) => {
+        const entity = {
+            "account_num": accNum,
+            "money_amount": moneyAmount,
+            "deposit_time": moment().format('YYYY-MM-DD HH:mm:ss')
+        }
+        const result = await db.add(entity, 'deposit_history');
+        return result;        
     }
 }

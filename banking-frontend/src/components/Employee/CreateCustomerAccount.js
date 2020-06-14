@@ -8,7 +8,7 @@ const formValid = formErrors =>{
     return valid;
 }
 
-const refresh = () =>{
+const refresh = (cb) =>{
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
 
@@ -21,6 +21,7 @@ const refresh = () =>{
         if(response.data.accessToken){
             localStorage.setItem('accessToken', response.data.accessToken);
         }
+        cb()
     }).catch((error) => {
         console.log(error.response);
     })
@@ -59,17 +60,17 @@ export default class CreateCustomerAccount extends Component{
                     'x-access-token' : localStorage.getItem('accessToken')
                 }
             }
-            
-            refresh();
-            axios.post('http://localhost:8080/api/user/register', submitForm, config).then(function (response) {
+            refresh(axios.post('http://localhost:8080/user/register', submitForm, config).then(function (response) {
                 console.log(response.data);
                 alert('Register success');
             }).catch(function (error){
                 console.log(error);
-            });
+            }));
+            
             this.setState({
                 username: "",
                 password: "",
+                repassword: "",
                 fullname: "",
                 phoneNo: "",
                 formErrors:{

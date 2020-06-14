@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 
-const refresh = () =>{
+const refresh = (cb) =>{
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
 
@@ -13,10 +13,11 @@ const refresh = () =>{
     axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
         if(response.data.accessToken){
             localStorage.setItem('accessToken', response.data.accessToken);
+            cb();
         }
     }).catch((error) => {
         console.log(error.response);
-    })
+    });
 }
 
 export default class DepositMoney extends Component{
@@ -43,16 +44,18 @@ export default class DepositMoney extends Component{
             }
         }
 
-        refresh();
-        axios.post('http://localhost:8080/deposit', submitForm, config).then((response)=>{
+        const callDepositApi = axios.post('http://localhost:8080/deposit', submitForm, config).then((response)=>{
             console.log(response);
             if(response.data.success){
                 alert('Deposit successful');
             }
         }).catch((error)=>{
             console.log(error.response);
-            alert(`Deposit fail: ${error.response.data.error}`);
+            alert(`Deposit fail: ${error.response.statusText}`);
         });
+
+        refresh(callDepositApi);
+        
         this.setState({
             accountNumber: "",
             moneyAmount: ""
