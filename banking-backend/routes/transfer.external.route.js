@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     res.json(balance);
 })
 
-router.put('/update', async(req, res) => {
+router.post('/update', async(req, res) => {
     const accNum = +req.body.accNum || -1;
     const moneyAmount = +req.body.moneyAmount || -1;
     if(accNum === -1 || moneyAmount === -1){
@@ -23,7 +23,7 @@ router.put('/update', async(req, res) => {
         })
     }
 
-    const ts = +req.headers['time'] || 0;
+    const ts = +req.headers['x-time'] || 0;
     const currentTime = moment().valueOf();
     const expireTime = 600000; // 10 mins
 
@@ -32,16 +32,17 @@ router.put('/update', async(req, res) => {
         return res.status(203).json({error});
     }
 
-    const bankCode = await authModel.detail(req.headers['bank-code']);
-    if(bankCode.length === 0){
+    const bank = await authModel.detail(req.headers['x-partner-code']);
+    if(bank.length === 0){
         const error = 'Can not identify bank';
         return res.status(203).json({error});
     }
 
     const body = JSON.stringify(req.body);
-    const headerSig = req.headers['sig'] || 0;
-    const sig = crypto.createHash('sha256').update(ts + body + bankCode[0].secretKey).digest('hex');
-    if(sig !== headerSig){
+    const headerHash = req.headers['x-hash'] || 0;
+    const hash = crypto.createHash('sha256').update(ts + body + bank[0].secretKey).digest('hex');
+    
+    if(hash !== headerHash){
         const error = 'Not original request';
         return res.status(203).json({error});
     }
@@ -49,15 +50,18 @@ router.put('/update', async(req, res) => {
     const list = await transferModel.getBalance(accNum);
     if(list.length > 0){
         const balance = Number(list[0].balance);
-        const publicKeyArmored = bankCode[0].publicKeyPGP;
-        const sigPGP = req.headers['signature-pgp']
+        const publicKeyArmored = bank[0].publicKey;
+        const sigPGP = req.headers['x-signature-pgp'];
         if(await verifyData(publicKeyArmored, sigPGP)){
             const result = await transferModel.update(Number(moneyAmount) + balance, accNum);
             const currentTime = moment().valueOf();
             const data = moneyAmount + ', ' + accNum + ', ' + currentTime;
             console.log(data);
             const mySig = await signData(data);
-            res.status(203).json({
+            const partnerId = bank[0].id;
+            const tranferTime = moment(ts).format('YYYY-MM-DD HH:mm:ss');
+            await transferModel.addToHistory(partnerId, moneyAmount, tranferTime, sigPGP);//Add to history
+            return res.status(203).json({
                 status: "success",
                 responseSignature: mySig
             });
@@ -86,11 +90,15 @@ async function signData(data){
 };
 
 async function verifyData(publicKeyArmored, sig){
+    const realpublicKey = publicKeyArmored.split("\\n").join("\n");
+    console.log(realpublicKey);
     const realSignature = sig.split("\\n").join("\n");
+    console.log(JSON.stringify(realSignature));
+    
     try {
         const verified = await openpgp.verify({
             message: await openpgp.cleartext.readArmored(realSignature),  // CleartextMessage or Message object
-            publicKeys: (await openpgp.key.readArmored(publicKeyArmored)).keys // for verification
+            publicKeys: (await openpgp.key.readArmored(realpublicKey)).keys // for verification
         });
         const { valid } = verified.signatures[0];
         

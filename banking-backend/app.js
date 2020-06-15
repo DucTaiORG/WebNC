@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const moment = require('moment');
 const userModel = require('./models/users.model');
+
 const cors = require('cors');
 const {verify, verifyEmployee, verifyAdmin} = require('./middlewares/auth.mdw');
 require('express-async-error');
@@ -19,14 +20,20 @@ app.get('/', function(req, res){
     });
 });
 
-app.use('/api/user', require('./routes/users.route'));
-app.use('/api/transfer', require('./routes/transferMoney.route'));
+app.use('/api/user', require('./routes/users.external.route'));
+app.use('/api/transfer', require('./routes/transfer.external.route'));
 app.use('/client/rsa', require('./routes/linkrsa.route'));
 app.use('/client/pgp', require('./routes/linkpgp.route'));
 app.use('/api/auth', require('./routes/auth.route'));
 app.use('/user', verify, require('./routes/users.internal.route'));
 app.use('/deposit', verifyEmployee, require('./routes/deposit.route'));
 app.use('/employee', verifyAdmin, require('./routes/employee.route'));
+app.use('/partner', verifyAdmin, require('./routes/partner.route'));
+/*app.get('/test', (req, res)=>{
+    return res.json({rand: randToken.generator({
+        chars: '123456789'
+    }).generate(9)});
+})*/
 
 //api register
 app.post('/user/register', verifyEmployee, async (req, res)=>{
@@ -36,13 +43,18 @@ app.post('/user/register', verifyEmployee, async (req, res)=>{
         return res.status(400).json({error: 'Username exist'});
     }
     const result = await userModel.add(req.body);
-    const ret = {
-        id: result.insertId,
-        ...req.body
+    if(result !== null){
+        const ret = {
+            id: result.insertId,
+            ...req.body
+        }
+    
+        delete ret.password;
+        return res.status(201).json(ret); 
+    }else{
+        const error = "Can not create payment account";
+        return res.status(500).json({error});
     }
-
-    delete ret.password;
-    res.status(201).json(ret); 
 });
 
 app.use((req, res, next) => {

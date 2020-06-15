@@ -3,7 +3,7 @@ const userModel = require('../models/users.model');
 const bcrypt = require('bcryptjs');
 
 module.exports = {
-    detail: code => db.load(`select * from partbank where partCode = '${code}'`),
+    detail: code => db.load(`select * from partnerbank where partnerCode = '${code}'`),
     login: async entity => {
         const row = await userModel.singleByUserName(entity.username);
         if(row.length === 0){

@@ -49,27 +49,42 @@ export default class CreateEmployee extends Component {
 
     handleSubmitForm = e =>{
         e.preventDefault();
-
+        const state = this.state;
         if(formValid(this.state.formErrors)){
-            const submitForm = this.state;
-            submitForm.userRole = 2;
-            submitForm.dateOfBirth = moment(submitForm.dateOfBirth).format('YYYY-MM-DD');
-            delete submitForm.formErrors;
-            delete submitForm.repassword;
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
 
-            const config = {
-                headers: {
-                    'x-access-token' : localStorage.getItem('accessToken')
-                }
+            const postBody = {
+                accessToken,
+                refreshToken
             }
 
-            refresh(axios.post('http://localhost:8080/employee/register', submitForm, config).then(function (response) {
-                console.log(response.data);
-                alert('Register success');
-            }).catch(function (error){
+            axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
+                if(response.data.accessToken){
+                    localStorage.setItem('accessToken', response.data.accessToken);
+                    const submitForm = state;
+                    submitForm.userRole = 2;
+                    submitForm.dateOfBirth = moment(submitForm.dateOfBirth).format('YYYY-MM-DD');
+                    delete submitForm.formErrors;
+                    delete submitForm.repassword;
+
+                    const config = {
+                        headers: {
+                            'x-access-token' : localStorage.getItem('accessToken')
+                        }
+                    }
+
+                    axios.post('http://localhost:8080/employee/register', submitForm, config).then(function (response) {
+                        console.log(response.data);
+                        alert('Register success');
+                    }).catch(function (error){
+                        console.log(error.response);
+                        alert(error.response.data.error)
+                    })
+                }
+            }).catch((error) => {
                 console.log(error.response);
-                alert(error.response.data)
-            }));
+            })
             
             this.setState({
                 username: "",

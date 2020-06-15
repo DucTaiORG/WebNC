@@ -1,6 +1,7 @@
 const db = require('../utils/db');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
+const randToken = require('rand-token');
 
 module.exports = {
     all: _ => db.load('select users.id, users.fullname, users.dateOfBirth, users.username, users.userRole' 
@@ -12,10 +13,29 @@ module.exports = {
     detailByUserId: id => db.load(`select users.id, users.fullname, users.dateOfBirth, paymentaccount.accountNumber 
                                     from users join paymentaccount on users.id = paymentaccount.userId  where users.id = ${id}`),
     
-    add: entity =>{
+    add: async entity =>{
         const password_hash = bcrypt.hashSync(entity.password, 8);
         entity.password = password_hash;
-        return db.add(entity, 'users');
+        const ret = await db.add(entity, 'users');
+        if(entity.userRole === 1){
+            const userId = ret.insertId;
+            const accountNumber = randToken.generator({
+                chars: '123456789'
+            }).generate(9);
+            const paymentEntity = {
+                userId,
+                accountNumber,
+                balance: 0
+            }
+            const resultAccPayment = await db.add(paymentEntity, 'paymentaccount');
+            if(resultAccPayment.insertId){
+                return ret;
+            }else{
+                return null;
+            }
+        }
+
+        return ret;
     },
 
     singleByUserName: userName => {

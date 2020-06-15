@@ -23,7 +23,7 @@ router.get('/:id', async (req, res) => {
     }
     const id = +req.params.id || -1;
     
-    const ts = +req.headers['time'] || 0;
+    const ts = +req.headers['x-time'] || 0;
     const currentTime = moment().valueOf();
     const expireTime = 600000; // 10 mins
 
@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
         return res.status(203).json({error});
     }
 
-    const headerSig = req.headers['sig'] || 0;
+    const headerSig = req.headers['x-signature'] || 0;
     
     const sig = crypto.createHash('sha256').update(ts + secretKey).digest('hex');
     if(sig !== headerSig){
@@ -40,7 +40,7 @@ router.get('/:id', async (req, res) => {
         return res.status(203).json({error});
     }
 
-    const code = await authModel.detail(req.headers['bank-code']);
+    const code = await authModel.detail(req.headers['x-partner-code']);
     if(code.length === 0){
         const error = 'Can not identify bank';
         return res.status(203).json({error});

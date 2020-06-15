@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Table, Dropdown, DropdownButton, Button} from 'react-bootstrap';
 import axios from 'axios';
-import moment from 'moment';
 class HistoryRow extends Component{
     render(){
         return(
@@ -91,9 +90,11 @@ export default class ViewHistory extends Component{
                 <span>{this.state.viewType}</span> 
                 <Table striped bordered hover>
                     <thead>
-                        <th>#</th>
-                        <th>Deposit Money</th>
-                        <th>Time</th>
+                        <tr>
+                            <th>#</th>
+                            <th>Deposit Money</th>
+                            <th>Time</th>
+                        </tr>
                     </thead>
                     <tbody>
                         {

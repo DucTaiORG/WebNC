@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
+import {Link} from 'react-router-dom';
 
 export default class TableRow extends Component {
+  constructor(props){
+    super(props);
+  }
+  delete = () => {
+    this.props.handelDel(this.props.obj.id);
+  }
+
   render() {
     return (
         <tr>
@@ -20,10 +28,10 @@ export default class TableRow extends Component {
             {this.props.obj.dateOfBirth}
           </td>
           <td>
-            <button className="btn btn-primary">Edit</button>
+            <Link to={'/admin/management/edit/' + this.props.obj.id} className="btn btn-primary">Edit</Link>
           </td>
           <td>
-            <button className="btn btn-danger">Delete</button>
+            <button className="btn btn-danger" onClick={this.delete}>Delete</button>
           </td>
         </tr>
     );
