@@ -4,7 +4,7 @@ const userModel = require('../models/users.model');
 const config = require('../config/default.json');
 
 module.exports = {
-    verify: (req, res, next) => {
+    verifyUser: (req, res, next) => {
         const token = req.headers['x-access-token'];
         if(token){
             jwt.verify(token, config.secretKey, function(err, payload){
@@ -13,7 +13,12 @@ module.exports = {
                     return;
                 }
                 const {userId} = payload;
-                req.body.userId = userId;
+                const rows = await userModel.singleByUserId(userId);
+                const userRole = rows[0].userRole;
+                if(userRole !== 1){
+                    next(createError(402, 'Do not allow to access resource'));
+                    return;
+                }
                 next(); 
             });
         }else{

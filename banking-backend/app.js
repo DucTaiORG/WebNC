@@ -4,7 +4,7 @@ const moment = require('moment');
 const userModel = require('./models/users.model');
 
 const cors = require('cors');
-const {verify, verifyEmployee, verifyAdmin} = require('./middlewares/auth.mdw');
+const {verifyUser, verifyEmployee, verifyAdmin} = require('./middlewares/auth.mdw');
 require('express-async-error');
 
 const app = express();
@@ -25,11 +25,11 @@ app.use('/api/transfer', require('./routes/transfer.external.route'));
 app.use('/client/rsa', require('./routes/linkrsa.route'));
 app.use('/client/pgp', require('./routes/linkpgp.route'));
 app.use('/api/auth', require('./routes/auth.route'));
-app.use('/user', verify, require('./routes/users.internal.route'));
+app.use('/user', verifyUser, require('./routes/users.internal.route'));
 app.use('/deposit', verifyEmployee, require('./routes/deposit.route'));
 app.use('/employee', verifyAdmin, require('./routes/employee.route'));
 app.use('/partner', verifyAdmin, require('./routes/partner.route'));
-app.use('/account', verify, require('./routes/account.route'));
+app.use('/account', verifyUser, require('./routes/account.route'));
 /*app.get('/test', (req, res)=>{
     return res.json({rand: randToken.generator({
         chars: '123456789'
