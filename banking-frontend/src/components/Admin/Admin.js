@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import HistoryAdmin from './HistoryAdmin';
 import EmployeeManagement from './EmployeeManagement'
 import { Route, Link } from 'react-router-dom';
-import './Admin.css'
+import './Admin.css';
 
 export default class Admin extends Component{
     render(){

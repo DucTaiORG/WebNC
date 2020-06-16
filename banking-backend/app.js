@@ -29,6 +29,7 @@ app.use('/user', verify, require('./routes/users.internal.route'));
 app.use('/deposit', verifyEmployee, require('./routes/deposit.route'));
 app.use('/employee', verifyAdmin, require('./routes/employee.route'));
 app.use('/partner', verifyAdmin, require('./routes/partner.route'));
+app.use('/account', verify, require('./routes/account.route'));
 /*app.get('/test', (req, res)=>{
     return res.json({rand: randToken.generator({
         chars: '123456789'

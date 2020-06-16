@@ -76,7 +76,7 @@ module.exports = {
     },
 
     singleByUserId: userId => {
-        return db.load(`select * from users where id = ${userId}`);
+        return db.load(`select users.id, users.username, users.fullname, users.dateOfBirth, users.email, users.phoneNo, users.userRole from users where id = ${userId}`);
     },
 
     addToDepositHistory: async (accNum, moneyAmount) => {

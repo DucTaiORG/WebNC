@@ -12,7 +12,9 @@ module.exports = {
                     next(createError(401, err));
                     return;
                 }
-                next();
+                const {userId} = payload;
+                req.body.userId = userId;
+                next(); 
             });
         }else{
             next(createError(401, 'No access token.'));

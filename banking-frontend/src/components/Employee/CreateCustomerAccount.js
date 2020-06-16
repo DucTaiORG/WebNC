@@ -66,12 +66,14 @@ export default class CreateCustomerAccount extends Component{
                 username: "",
                 password: "",
                 repassword: "",
+                email: "",
                 fullname: "",
                 phoneNo: "",
                 formErrors:{
                     username: "",
                     password: "",
                     repassword: "",
+                    email: "",
                     fullname: "",
                     phoneNo: "",
                 }
@@ -142,6 +144,11 @@ export default class CreateCustomerAccount extends Component{
                         <label>Re-password</label>
                         <input type="password" name="repassword" value={this.state.repassword} className="form-control" placeholder="Re-enter password" onChange={this.handleInputChange}/>
                         {formErrors.repassword.length > 0 ? <span style={{color: 'red'}}>{formErrors.repassword}</span>:null}
+                    </div>
+
+                    <div className="form-group">
+                        <label>Customer name</label>
+                        <input type="text" name="email" value={this.state.email} className="form-control" placeholder="Enter customer name" onChange={this.handleInputChange}/>
                     </div>
 
                     <div className="form-group">

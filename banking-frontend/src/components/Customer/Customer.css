@@ -1,0 +1,14 @@
+.customer-content{
+    flex: 1;
+    padding: 20px;
+    height: max-content;
+}
+
+.customer-inner{
+    max-width: 1000px;
+    margin: auto;
+    background: #ffffff;
+    box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2);
+    padding: 40px 55px 45px 55px;
+    transition: all .3s;
+}

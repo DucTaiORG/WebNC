@@ -1,5 +1,4 @@
 const db = require('../utils/db');
-const { singleByUserId } = require('./users.model');
 
 module.exports = {
     all: _ => db.load(`select users.id, users.fullname, users.username, users.phoneNo, users.dateOfBirth, users.email from users where userRole = 2`),
@@ -20,6 +19,6 @@ module.exports = {
             id: empId
         }
 
-        return db.delete('users', condition);np
+        return db.delete('users', condition);
     }
 }
