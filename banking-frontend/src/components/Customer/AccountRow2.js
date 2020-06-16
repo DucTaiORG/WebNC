@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class Receiver extends Component {
+export default class AccountRow extends Component {
     constructor(props){
       super(props);
     }
@@ -12,13 +12,7 @@ export default class Receiver extends Component {
                     {this.props.obj.accountNumber}
                 </td>
                 <td>
-                    {this.props.obj.fullname}
-                </td>
-                <td>
-                    {this.props.obj.phoneNo}
-                </td>
-                <td>
-                    {this.props.obj.dateOfBirth}
+                    {this.props.obj.balance}
                 </td>
             </tr>
         );

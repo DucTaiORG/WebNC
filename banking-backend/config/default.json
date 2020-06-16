@@ -11,5 +11,6 @@
 
     "secretKey": "nhom34banking",
 
-    "bankCode": "partner34"
+    "bankCode": "partner34",
+    "transferFee": 20000
 }

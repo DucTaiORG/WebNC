@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 15, 2020 lúc 05:22 PM
+-- Thời gian đã tạo: Th6 16, 2020 lúc 05:11 PM
 -- Phiên bản máy phục vụ: 10.4.11-MariaDB
 -- Phiên bản PHP: 7.4.2
 
@@ -117,8 +117,8 @@ CREATE TABLE `paymentaccount` (
 --
 
 INSERT INTO `paymentaccount` (`id`, `userId`, `balance`, `accountNumber`) VALUES
-(1, 1, 1031599, 123456789),
-(2, 18, 0, 794351225);
+(1, 10, 11000, 123456789),
+(2, 18, 470000, 794351225);
 
 -- --------------------------------------------------------
 
@@ -133,6 +133,14 @@ CREATE TABLE `savingaccount` (
   `accountNumber` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Đang đổ dữ liệu cho bảng `savingaccount`
+--
+
+INSERT INTO `savingaccount` (`id`, `userId`, `balance`, `accountNumber`) VALUES
+(1, 18, 10000, 797083952),
+(2, 18, 200000, 132746691);
+
 -- --------------------------------------------------------
 
 --
@@ -146,6 +154,18 @@ CREATE TABLE `transfer_history` (
   `to_account` text NOT NULL,
   `time` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Đang đổ dữ liệu cho bảng `transfer_history`
+--
+
+INSERT INTO `transfer_history` (`id`, `money_amount`, `from_account`, `to_account`, `time`) VALUES
+(1, 10000, '794351225', '123456789', '2020-06-16 22:03:20'),
+(2, 12345, '794351225', '123456789', '2020-06-16 22:08:27'),
+(3, 80000, '794351225', '123456789', '2020-06-16 22:08:39'),
+(4, 70000, '794351225', '123456789', '2020-06-16 22:08:54'),
+(5, 60000, '794351225', '123456789', '2020-06-16 22:09:13'),
+(6, 10000, '794351225', '123456789', '2020-06-16 22:10:54');
 
 -- --------------------------------------------------------
 
@@ -172,11 +192,11 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `fullname`, `phoneNo`, `dateOfBirth`, `userRole`, `refreshToken`, `rdt`) VALUES
 (1, 'ductai', '$2a$08$EGbafBgBJd95a2DYKxp7MeVw6CGnIzdZNWfwodggKWRLpTRGiNVOO', '', 'Lâm Đức Tài', '0123456789', '0000-00-00', 3, 'XX16H7bLSMqNt3vvHf3lYz2aMDPASXzbgKV2Rf0XRqmrh960whb18zpDgDo3l3PE45oP1k0GwuRE8Uyx', '2020-06-15 22:21:12'),
-(8, 'employee', '$2a$08$Oxz2ZVIVx/nVL02q9iUmiOYVaGIFbtv0y/SMQrdHG/aWPAK6aP20C', '', 'Đức Tài', '0123456789', '0000-00-00', 2, 'SybAjDl8G2Jy9wTM8Noo6cQee4K8cUn1GWLOwUfGONWijjFyhiYgQScjwbSv6GrjcFCFtHQcLA7Z6Inw', '2020-06-15 17:40:10'),
+(8, 'employee', '$2a$08$Oxz2ZVIVx/nVL02q9iUmiOYVaGIFbtv0y/SMQrdHG/aWPAK6aP20C', '', 'Đức Tài', '0123456789', '0000-00-00', 2, 'tWxuyPoxiyAnEit4YByV5ngEDandT6lQEBP0MPdasDsjQL860V9dDdN0ZRGMq5JJe6XEuavJ996Dhns1', '2020-06-16 22:10:02'),
 (9, 'ductai2', '$2a$08$bb0D1Y8DVNnJUrJeURWNaerRQBRsOAW5RZlic3GX55E1UDaUIWkQa', '', 'Đức Tài', '0123456789', '0000-00-00', 1, '', '0000-00-00 00:00:00'),
 (10, 'user123', '$2a$08$6MWkNBjZLtl2owwhtMcinevshAAxyrDsWP0V6odCg7CVnqqASo6Yu', '', 'Tài Đức', '0908960580', '0000-00-00', 1, '', '0000-00-00 00:00:00'),
 (11, 'employee1', '$2a$08$maIUJsX67lsKLRWQ2PuiC.UPUDrMeU/zYkExpDIBqdqhpoMdFw4Su', 'nva@gmail.com', 'Nguyễn Văn A', '0908960580', '2020-06-10', 2, '', '0000-00-00 00:00:00'),
-(18, 'customer1', '$2a$08$xvk3jhXw606O7WXzrGR.VusFMr2TwlqbxcqtvSeeFSPq.CZdb4H6K', '', 'Nguyễn Văn C', '0123456789', '0000-00-00', 1, '', '0000-00-00 00:00:00');
+(18, 'customer1', '$2a$08$xvk3jhXw606O7WXzrGR.VusFMr2TwlqbxcqtvSeeFSPq.CZdb4H6K', '', 'Nguyễn Văn C', '0123456789', '0000-00-00', 1, 'QMVC5MUCPe4Ef5bO9HqWhzpkX7S7uFWaHc16PwUo0bgfGlx95wMWqytHeM02ezDiTwRPvVbxfrT0JWAI', '2020-06-16 22:10:32');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -256,13 +276,13 @@ ALTER TABLE `paymentaccount`
 -- AUTO_INCREMENT cho bảng `savingaccount`
 --
 ALTER TABLE `savingaccount`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT cho bảng `transfer_history`
 --
 ALTER TABLE `transfer_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT cho bảng `users`

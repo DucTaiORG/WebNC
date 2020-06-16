@@ -4,10 +4,10 @@ const userModel = require('../models/users.model');
 const config = require('../config/default.json');
 
 module.exports = {
-    verifyUser: (req, res, next) => {
+    verifyUser: async (req, res, next) => {
         const token = req.headers['x-access-token'];
         if(token){
-            jwt.verify(token, config.secretKey, function(err, payload){
+            jwt.verify(token, config.secretKey, async function(err, payload){
                 if(err){
                     next(createError(401, err));
                     return;

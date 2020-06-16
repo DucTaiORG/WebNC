@@ -7,11 +7,14 @@ module.exports = {
     all: _ => db.load('select users.id, users.fullname, users.dateOfBirth, users.username, users.userRole' 
                         + ' from users'),
 
-    detail: accNo => db.load(`select users.id, users.fullname, users.dateOfBirth, paymentaccount.accountNumber 
+    detailByAccNumber: accNo => db.load(`select paymentaccount.accountNumber, users.fullname, users.phoneNo, users.dateOfBirth 
                                 from users join paymentaccount on users.id = paymentaccount.userId  where paymentaccount.accountNumber = ${accNo}`),
 
-    detailByUserId: id => db.load(`select users.id, users.fullname, users.dateOfBirth, paymentaccount.accountNumber 
+    detailByUserId: id => db.load(`select users.id, paymentaccount.accountNumber, users.fullname, users.phoneNo, users.dateOfBirth 
                                     from users join paymentaccount on users.id = paymentaccount.userId  where users.id = ${id}`),
+
+    detailBalanceByUserId: id => db.load(`select users.id, paymentaccount.accountNumber, paymentaccount.balance 
+                                            from users join paymentaccount on users.id = paymentaccount.userId  where users.id = ${id}`),
     
     add: async entity =>{
         const password_hash = bcrypt.hashSync(entity.password, 8);

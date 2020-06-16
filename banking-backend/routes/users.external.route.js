@@ -15,13 +15,13 @@ router.get('/', async (req, res) => {
 })
 
 //api get user detail
-router.get('/:id', async (req, res) => {
-    if(isNaN(req.params.id)){
+router.get('/:accNum', async (req, res) => {
+    if(isNaN(req.params.accNum)){
         return res.status(400).json({
-            err: 'Invalid Id'
+            err: 'Invalid params'
         });
     }
-    const id = +req.params.id || -1;
+    const accNum = +req.params.accNum || -1;
     
     const ts = +req.headers['x-time'] || 0;
     const currentTime = moment().valueOf();
@@ -45,7 +45,7 @@ router.get('/:id', async (req, res) => {
         const error = 'Can not identify bank';
         return res.status(203).json({error});
     }
-    const list = await userModel.detail(id);
+    const list = await userModel.detailByAccNumber(accNum);
     if(list.length === 0){
         return res.status(204).end();
     }
