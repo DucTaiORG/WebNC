@@ -140,8 +140,7 @@ export default class DepositMoney extends Component{
 
     handleSubmitForm = e => {
         e.preventDefault();
-        this.setState({showModal: true});
-        /*const state = this.state;
+        const state = this.state;
         const accessToken = localStorage.getItem('accessToken');
         const refreshToken = localStorage.getItem('refreshToken');
 
@@ -167,32 +166,19 @@ export default class DepositMoney extends Component{
                     }
                 }
 
-                axios.post('http://localhost:8080/transfer', submitForm, config).then((response)=>{
+                axios.post('http://localhost:8080/transfer/addHistory', submitForm, config).then((response)=>{
                     console.log(response);
                     if(response.data.success){
-                        axios.get('http://localhost:8080/user/byUserId/' + userId, config).then(response => {
-                            console.log(response);
-                            const responseData = {...response.data};
-                            this.setState({loggedAccount: responseData});
-                        }).catch(error=>{
-                            console.log(error);
-                        });
-                        alert('Transfer successful');
+                        this.setState({showModal: true});
                     }
                 }).catch((error)=>{
                     console.log(error.response);
                     alert(`Transfer fail: ${error.response.data.error}`);
                 });
-
             }
         }).catch((error) => {
             console.log(error.response);
         });
-        
-        this.setState({
-            toAccount: "",
-            moneyAmount: ""
-        });*/
     }
 
     handleItemSelect = (eventKey, event)=>{
@@ -211,34 +197,29 @@ export default class DepositMoney extends Component{
     handleSubmitModal = (otp)=>{
         console.log('otp: '+ otp);
         const state = this.state;
-        const accessToken = localStorage.getItem('accessToken');
-        const refreshToken = localStorage.getItem('refreshToken');
+        const submitVerify = {
+            fromAcc: state.loggedAccount.accountNumber,
+            otpNum: otp
+        };
 
-        const postBody = {
-            accessToken,
-            refreshToken
+        const submitTransfer = {
+            fromAcc: this.state.loggedAccount.accountNumber,
+            toAcc: this.state.toAccount,
+            moneyAmount: this.state.moneyAmount,
+            transferFeeType: this.state.transferFeeType,
+            otpNum: otp
         }
 
-        axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
-            if(response.data.accessToken){
-                localStorage.setItem('accessToken', response.data.accessToken);
+        const config = {
+            headers: {
+                'x-access-token' : localStorage.getItem('accessToken')
+            }
+        }
 
-                const submitForm = {
-                    fromAcc: state.loggedAccount.accountNumber,
-                    toAcc: state.toAccount,
-                    moneyAmount: state.moneyAmount,
-                    transferFeeType: state.transferFeeType,
-                    otp
-                };
-
-                const config = {
-                    headers: {
-                        'x-access-token' : localStorage.getItem('accessToken')
-                    }
-                }
-
-                axios.post('http://localhost:8080/transfer', submitForm, config).then((response)=>{
-                    console.log(response);
+        axios.post('http://localhost:8080/transfer/verify', submitVerify, config).then((response)=>{
+            console.log(response);
+            if(response.data.success){
+                axios.post('http://localhost:8080/transfer', submitTransfer, config).then(response => {
                     if(response.data.success){
                         axios.get('http://localhost:8080/user/byUserId/' + userId, config).then(response => {
                             console.log(response);
@@ -249,25 +230,22 @@ export default class DepositMoney extends Component{
                         });
                         alert('Transfer successful');
                     }
-                }).catch((error)=>{
+                }).catch(error => {
                     console.log(error.response);
-                    alert(`Transfer fail: ${error.response.data.error}`);
                 });
-
+            }else{
+                alert('Verify fail!');
             }
-        }).catch((error) => {
+        }).catch((error)=>{
             console.log(error.response);
+            alert(`Transfer fail`);
         });
         
         this.setState({
             toAccount: "",
-            moneyAmount: ""
+            moneyAmount: "",
+            showModal: false
         });
-        this.setState({showModal: false});
-    }
-
-    handleShowModal = () => {
-        return this.props.showModal;
     }
 
     render(){

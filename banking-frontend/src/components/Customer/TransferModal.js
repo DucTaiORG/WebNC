@@ -5,7 +5,7 @@ export default class TransferModal extends Component{
     constructor(props){
         super(props);
         this.state = {
-            otpCode: 123456,
+            otpCode: '',
         }
     }
 
@@ -15,6 +15,7 @@ export default class TransferModal extends Component{
 
     handleSubmitModal = () => {
         this.props.submitmodal(this.state.otpCode);
+        this.setState({otpCode: ''})
         this.handelCloseModal();
     }
 
@@ -26,7 +27,7 @@ export default class TransferModal extends Component{
         return (
             <Modal {...this.props} size="sm" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Modal title</Modal.Title>
+                    <Modal.Title>Enter OTP</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>

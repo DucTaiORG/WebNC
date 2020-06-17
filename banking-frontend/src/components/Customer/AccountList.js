@@ -80,9 +80,9 @@ export default class AccountList extends Component{
 
         if(eventKey == 1){
             axios.get('http://localhost:8080/account/payment/' + userId, config).then(response => {
-                    console.log(response);
-                    const responseList = [...response.data];
-                    this.setState({accountList: responseList});
+                console.log(response);
+                const responseList = [...response.data];
+                this.setState({accountList: responseList});
             }).catch(error=>{
                 console.log(error);
             });
@@ -90,9 +90,9 @@ export default class AccountList extends Component{
 
         if(eventKey == 2){
             axios.get('http://localhost:8080/account/saving/' + userId, config).then(response => {
-                    console.log(response);
-                    const responseList = [...response.data];
-                    this.setState({accountList: responseList});
+                console.log(response);
+                const responseList = [...response.data];
+                this.setState({accountList: responseList});
             }).catch(error=>{
                 console.log(error);
             });

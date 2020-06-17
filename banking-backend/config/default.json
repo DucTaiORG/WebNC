@@ -12,5 +12,7 @@
     "secretKey": "nhom34banking",
 
     "bankCode": "partner34",
-    "transferFee": 20000
+    "transferFee": 20000,
+    "MAILGUN_USER": "ronin32014@gmail.com",
+    "MAILGUN_PASSWORD": "aA1597856841"
 }
