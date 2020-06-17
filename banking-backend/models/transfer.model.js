@@ -2,6 +2,7 @@ const db = require('../utils/db');
 const moment = require('moment');
 const userModel = require('../models/users.model');
 const config = require('../config/default.json');
+const randToken = require('rand-token');
 
 module.exports = {
     transfer: async (fromAcc, toAcc, moneyAmount, transferFee) => {
@@ -24,7 +25,7 @@ module.exports = {
         };
 
         const result = await db.add(entity, 'transfer_history');
-        if(result.affectedRows){
+        if(result.insertId){
             const fromAccBalance = fromAccount[0].balance;
             const toAccBalance = toAccount[0].balance;
             if(transferFee == 1){ //Sender bear the fee
@@ -50,5 +51,35 @@ module.exports = {
         }
         
         return 1;
+    },
+
+    verifyOTP: async (fromAcc, otpNum) => {
+        const from = Number(fromAcc);
+        const otp = Number(otpNum);
+        const transferList = await db.load(`select * from transfer_history where otp_num = ${otp} and from_account = ${from}`);
+        if(transferList.length == 0){
+            return false;
+        }
+        return true;
+    },
+
+    addToHistory: async (fromAcc, toAcc, moneyAmount, transferFee) => {
+        const otpNumber = randToken.generator({
+            chars: '123456789'
+        }).generate(6);
+        const entity = {
+            money_amount: money,
+            from_account: fromAcc,
+            to_account: toAcc,
+            time: moment().format('YYYY-MM-DD HH:mm:ss'),
+            otp_number: otpNumber,
+            isSuccess: false
+        };
+
+        const result = await db.add(entity, 'transfer_history');
+        if(result.affectedRows){
+            return true;
+        }
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import AccountRow from './AccountRow2';
 import {Table, Dropdown, DropdownButton} from 'react-bootstrap';
 import Receiver from './Receiver';
 import jwt_decode from 'jwt-decode';
+import TransferModal from './TransferModal';
 import './Customer.css';
 
 const {userId} = jwt_decode(localStorage.getItem('accessToken'));
@@ -44,7 +45,8 @@ export default class DepositMoney extends Component{
                 dateOfBirth: '2020-10-10'
             },
             selectedName: 'From list',
-            transferFeeType: 1
+            transferFeeType: 1,
+            showModal: false
         }
     }
 
@@ -138,7 +140,8 @@ export default class DepositMoney extends Component{
 
     handleSubmitForm = e => {
         e.preventDefault();
-        const state = this.state;
+        this.setState({showModal: true});
+        /*const state = this.state;
         const accessToken = localStorage.getItem('accessToken');
         const refreshToken = localStorage.getItem('refreshToken');
 
@@ -189,7 +192,7 @@ export default class DepositMoney extends Component{
         this.setState({
             toAccount: "",
             moneyAmount: ""
-        });
+        });*/
     }
 
     handleItemSelect = (eventKey, event)=>{
@@ -199,6 +202,72 @@ export default class DepositMoney extends Component{
 
     handleRadioButton = (event)=>{
         this.setState({transferFeeType: event.target.value}, ()=>console.log(this.state.transferFeeType));
+    }
+
+    handleCloseModal = ()=>{
+        this.setState({showModal: false});
+    }
+
+    handleSubmitModal = (otp)=>{
+        console.log('otp: '+ otp);
+        const state = this.state;
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        const postBody = {
+            accessToken,
+            refreshToken
+        }
+
+        axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
+            if(response.data.accessToken){
+                localStorage.setItem('accessToken', response.data.accessToken);
+
+                const submitForm = {
+                    fromAcc: state.loggedAccount.accountNumber,
+                    toAcc: state.toAccount,
+                    moneyAmount: state.moneyAmount,
+                    transferFeeType: state.transferFeeType,
+                    otp
+                };
+
+                const config = {
+                    headers: {
+                        'x-access-token' : localStorage.getItem('accessToken')
+                    }
+                }
+
+                axios.post('http://localhost:8080/transfer', submitForm, config).then((response)=>{
+                    console.log(response);
+                    if(response.data.success){
+                        axios.get('http://localhost:8080/user/byUserId/' + userId, config).then(response => {
+                            console.log(response);
+                            const responseData = {...response.data};
+                            this.setState({loggedAccount: responseData});
+                        }).catch(error=>{
+                            console.log(error);
+                        });
+                        alert('Transfer successful');
+                    }
+                }).catch((error)=>{
+                    console.log(error.response);
+                    alert(`Transfer fail: ${error.response.data.error}`);
+                });
+
+            }
+        }).catch((error) => {
+            console.log(error.response);
+        });
+        
+        this.setState({
+            toAccount: "",
+            moneyAmount: ""
+        });
+        this.setState({showModal: false});
+    }
+
+    handleShowModal = () => {
+        return this.props.showModal;
     }
 
     render(){
@@ -261,12 +330,11 @@ export default class DepositMoney extends Component{
                                 <label><input type="radio" name="feeType" value={2} onClick={this.handleRadioButton} style={{marginRight: 10}}/>Receiver bear fee</label>
                             </div>
                         </div>
-
-                        
-
                         <button type="submit" className="btn btn-primary btn-block submit-button-customer">Submit</button>
                     </form>
                 </div>
+
+                <TransferModal show={this.state.showModal} closemodal={this.handleCloseModal} submitmodal={this.handleSubmitModal}/>
             </div>
         );
     }

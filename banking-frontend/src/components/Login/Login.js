@@ -23,6 +23,7 @@ export default class Login extends Component {
     handleInputChange = (e) =>{        
         this.setState({[e.target.name]: e.target.value})
     }
+    
     render() {
         return (
             <div className="auth-wrapper">

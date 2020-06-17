@@ -47,8 +47,8 @@ module.exports = {
 
     updateRefreshToken: async (userId, refreshToken) => {
         const columnToDel = {
-            "refreshToken": null,
-            "rdt": null
+            "refreshToken": '',
+            "rdt": ''
         };
 
         const rdt = moment().format('YYYY-MM-DD HH:mm:ss');
