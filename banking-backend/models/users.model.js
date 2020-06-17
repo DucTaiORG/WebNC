@@ -46,11 +46,6 @@ module.exports = {
     },
 
     updateRefreshToken: async (userId, refreshToken) => {
-        const columnToDel = {
-            "refreshToken": '',
-            "rdt": ''
-        };
-
         const rdt = moment().format('YYYY-MM-DD HH:mm:ss');
         const column = {
             "refreshToken": refreshToken,
@@ -61,7 +56,6 @@ module.exports = {
             "id": userId
         };
 
-        await db.update('users', columnToDel, condition);
         return db.update('users', column, condition);
     },
 
