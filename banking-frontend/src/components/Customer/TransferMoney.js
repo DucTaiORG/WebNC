@@ -22,7 +22,8 @@ export default class DepositMoney extends Component{
             toAccount: '',
             moneyAmount: '',
             formErrors:{
-                toAccount: ''
+                toAccount: '',
+                moneyAmount: ''
             },
             loggedAccount:{
                 accountNumber: 123456789,
@@ -39,10 +40,10 @@ export default class DepositMoney extends Component{
                 }
             ],
             receiver:{
-                accountNumber: 114444444,
-                fullname: 'Nguyễn Văn A',
-                phoneNo: '0123456789',
-                dateOfBirth: '2020-10-10'
+                accountNumber: '',
+                fullname: '',
+                phoneNo: '',
+                dateOfBirth: ''
             },
             selectedName: 'From list',
             transferFeeType: 1,
@@ -82,10 +83,10 @@ export default class DepositMoney extends Component{
         });
     }
 
-    handleMoneyChange = e => {
+    /*handleMoneyChange = e => {
         e.preventDefault();
-        this.setState({moneyAmount: e.target.value},()=>console.log(this.state.moneyAmount));
-    }
+        this.setState({moneyAmount: e.target.value});
+    }*/
 
     handleInputChange = e =>{
         e.preventDefault();
@@ -100,8 +101,21 @@ export default class DepositMoney extends Component{
                     formErrors.toAccount = "";
                 }
                 break;
+            case "moneyAmount":
+                if(value.length == 0){
+                    formErrors.moneyAmount = "";
+                }else{
+                    if(Number(value) < 30000 || Number(value) > 500000000)
+                    {
+                        formErrors.moneyAmount = "Minimums is 10000, maximun is 500000000"
+                    }else{
+                        formErrors.moneyAmount = "";
+                    }
+                }
+                
+                break;
         }
-        this.setState({formErrors, [name]: value});
+        this.setState({formErrors, [name]: value}, ()=>console.log(this.state.formErrors));
 
         if(formValid(formErrors)){
             const accessToken = localStorage.getItem('accessToken');
@@ -141,44 +155,45 @@ export default class DepositMoney extends Component{
     handleSubmitForm = e => {
         e.preventDefault();
         const state = this.state;
-        const accessToken = localStorage.getItem('accessToken');
-        const refreshToken = localStorage.getItem('refreshToken');
-
-        const postBody = {
-            accessToken,
-            refreshToken
-        }
-
-        axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
-            if(response.data.accessToken){
-                localStorage.setItem('accessToken', response.data.accessToken);
-
-                const submitForm = {
-                    fromAcc: state.loggedAccount.accountNumber,
-                    toAcc: state.toAccount,
-                    moneyAmount: state.moneyAmount,
-                    transferFeeType: state.transferFeeType
-                };
-
-                const config = {
-                    headers: {
-                        'x-access-token' : localStorage.getItem('accessToken')
-                    }
-                }
-
-                axios.post('http://localhost:8080/transfer/addHistory', submitForm, config).then((response)=>{
-                    console.log(response);
-                    if(response.data.success){
-                        this.setState({showModal: true});
-                    }
-                }).catch((error)=>{
-                    console.log(error.response);
-                    alert(`Transfer fail: ${error.response.data.error}`);
-                });
+        if(formValid(this.state.formErrors)){
+            this.setState({showModal: true});
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+            const postBody = {
+                accessToken,
+                refreshToken
             }
-        }).catch((error) => {
-            console.log(error.response);
-        });
+
+            axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
+                if(response.data.accessToken){
+                    localStorage.setItem('accessToken', response.data.accessToken);
+
+                    const submitForm = {
+                        fromAcc: state.loggedAccount.accountNumber,
+                        toAcc: state.toAccount,
+                        moneyAmount: state.moneyAmount,
+                        transferFeeType: state.transferFeeType
+                    };
+
+                    const config = {
+                        headers: {
+                            'x-access-token' : localStorage.getItem('accessToken')
+                        }
+                    }
+
+                    axios.post('http://localhost:8080/transfer/addHistory', submitForm, config).then((response)=>{
+                        console.log(response);
+                    }).catch((error)=>{
+                        console.log(error.response);
+                        alert(`Transfer fail: ${error.response.data.error}`);
+                    });
+                }
+            }).catch((error) => {
+                console.log(error.response);
+            });
+        }else{
+            alert("Invalid form");
+        }
     }
 
     handleItemSelect = (eventKey, event)=>{
@@ -296,7 +311,8 @@ export default class DepositMoney extends Component{
 
                         <div className="form-group">
                             <label>Money amount</label>
-                            <input type="number" name="moneyAmount" value={this.state.moneyAmount} className="form-control customer-input" placeholder="Enter money amount" onChange={this.handleMoneyChange}/>
+                            <input type="number" name="moneyAmount" value={this.state.moneyAmount} className="form-control customer-input" placeholder="Enter money amount" onChange={this.handleInputChange}/>
+                            {formErrors.moneyAmount.length > 0 ? <span style={{color: 'red'}}>{formErrors.moneyAmount}</span>:null}
                         </div>
 
                         <div>

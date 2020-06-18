@@ -24,9 +24,13 @@ module.exports = {
             if(fromAccUpdateMoney < 0){
                 return 2;
             }
+            const historyUpdate = await db.update('transfer_history', {"otp_number": 0, "isSuccess": true}, {"otp_number": otp});
+            if(historyUpdate.affectedRows === 0){
+                return 2;
+            }
+            
             await db.update('paymentaccount', {"balance": fromAccUpdateMoney}, {"accountNumber": fromAcc});
-            await db.update('transfer_history', {"otp_number": 0, "isSuccess": true}, {"otp_number": otp});
-
+            
             const toAccUpdateMoney = money + toAccBalance;
             return db.update('paymentaccount', {"balance": toAccUpdateMoney}, {"accountNumber": toAcc});
         }else{
@@ -34,9 +38,12 @@ module.exports = {
             if(fromAccUpdateMoney < 0){
                 return 2;
             }
-            await db.update('paymentaccount', {"balance": fromAccUpdateMoney}, {"accountNumber": fromAcc});
-            await db.update('transfer_history', {"otp_number": 0, "isSuccess": true}, {"otp_number": otp});
+            const historyUpdate = await db.update('transfer_history', {"otp_number": 0, "isSuccess": true}, {"otp_number": otp});
+            if(historyUpdate.affectedRows === 0){
+                return 2;
+            }
             
+            await db.update('paymentaccount', {"balance": fromAccUpdateMoney}, {"accountNumber": fromAcc});
             const toAccUpdateMoney = money + toAccBalance - config.transferFee;
             return db.update('paymentaccount', {"balance": toAccUpdateMoney}, {"accountNumber": toAcc});
         }
