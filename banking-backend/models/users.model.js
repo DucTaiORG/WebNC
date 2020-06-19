@@ -84,5 +84,15 @@ module.exports = {
         }
         const result = await db.add(entity, 'deposit_history');
         return result;        
+    },
+
+    addContact: async(accountNumber, rememberName) => {
+        const entity = {
+            "accountNumber": accountNumber,
+            "rememberName": rememberName
+        }
+
+        const result = await db.add(entity, 'receiveaccount');
+        return result;
     }
 }
