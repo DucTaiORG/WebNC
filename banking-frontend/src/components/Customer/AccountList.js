@@ -6,7 +6,13 @@ import jwt_decode from 'jwt-decode';
 import './Customer.css';
 
 
-const {userId} = jwt_decode(localStorage.getItem('accessToken'));
+try {
+    console.log(localStorage.getItem('accessToken'));
+    var {userId} = jwt_decode(localStorage.getItem('accessToken'));
+} catch (error) {
+    console.log(error);
+}
+
 
 export default class AccountList extends Component{
     constructor(props){

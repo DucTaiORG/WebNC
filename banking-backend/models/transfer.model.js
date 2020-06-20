@@ -30,7 +30,6 @@ module.exports = {
             }
             
             await db.update('paymentaccount', {"balance": fromAccUpdateMoney}, {"accountNumber": fromAcc});
-            
             const toAccUpdateMoney = money + toAccBalance;
             return db.update('paymentaccount', {"balance": toAccUpdateMoney}, {"accountNumber": toAcc});
         }else{

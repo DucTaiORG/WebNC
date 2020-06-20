@@ -7,7 +7,12 @@ import jwt_decode from 'jwt-decode';
 import TransferModal from './TransferModal';
 import './Customer.css';
 
-const {userId} = jwt_decode(localStorage.getItem('accessToken'));
+try {
+    console.log(localStorage.getItem('accessToken'));
+    var {userId} = jwt_decode(localStorage.getItem('accessToken'));
+} catch (error) {
+    console.log(error);
+}
 
 const formValid = formErrors =>{
     let valid  = true;
