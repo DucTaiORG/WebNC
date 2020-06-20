@@ -12,7 +12,7 @@ const transport = nodemailer.createTransport({
         refreshToken: "1//04DFELocT_c6iCgYIARAAGAQSNwF-L9IrxgnI2KWpBhgXFoFs1jur4ud6VY34Ii_HwUlZng50Oq3JwxU_shphhn8aUQnTxL-MK1A",
         clientId: "350798295911-af0qginemf9jvs1tvpuoquiamh3kt4fk.apps.googleusercontent.com",
         clientSecret: "g7GmqXtK8GMoJz9CFubTmWG2",
-        accessUrl: "http://oauth2.googleapis.com/token"
+        expires: 1592636588250
     },
     tls:{
         rejectUnauthorized: false

@@ -112,7 +112,7 @@ export default class DepositMoney extends Component{
                 }else{
                     if(Number(value) < 30000 || Number(value) > 500000000)
                     {
-                        formErrors.moneyAmount = "Minimums is 10000, maximun is 500000000"
+                        formErrors.moneyAmount = "Minimums is 30000, maximun is 500000000"
                     }else{
                         formErrors.moneyAmount = "";
                     }
