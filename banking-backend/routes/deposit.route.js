@@ -34,7 +34,7 @@ router.post('/history', async (req, res)=>{
         return res.status(400).json({error});
     }
     ret.forEach(element => {
-       element.deposit_time = moment(element.deposit_time).format('HH:mm:ss DD/MM/YYYY'); 
+        element.time = moment(element.time).format('HH:mm:ss DD/MM/YYYY'); 
     });
     
     return res.json(ret);

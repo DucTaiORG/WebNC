@@ -95,6 +95,7 @@ export default class DepositMoney extends Component{
 
     handleInputChange = e =>{
         e.preventDefault();
+        console.log("Transfer Input change");
         const {name, value} = e.target;
         let formErrors = this.state.formErrors;
 
@@ -120,7 +121,7 @@ export default class DepositMoney extends Component{
                 
                 break;
         }
-        this.setState({formErrors, [name]: value}, ()=>console.log(this.state.formErrors));
+        this.setState({formErrors, [name]: value});
 
         if(formValid(formErrors)){
             const accessToken = localStorage.getItem('accessToken');
@@ -204,6 +205,19 @@ export default class DepositMoney extends Component{
     handleItemSelect = (eventKey, event)=>{
         this.setState({toAccount: eventKey});
         this.setState({selectedName: event.target.textContent});
+        const config = {
+            headers: {
+                'x-access-token' : localStorage.getItem('accessToken')
+            }
+        }
+
+        axios.get('http://localhost:8080/user/byAccountNum/' + eventKey, config).then(response => {
+            console.log(response);
+            const responseData = {...response.data};
+            this.setState({receiver: responseData});
+        }).catch(error=>{
+            console.log(error);
+        });
     }
 
     handleRadioButton = (event)=>{
