@@ -84,5 +84,35 @@ module.exports = {
         }
         const result = await db.add(entity, 'deposit_history');
         return result;        
+    },
+
+    addToReceiveAccount: async(accountNumber, rememberName) => {
+        const entity = {
+            "accountNumber": accountNumber,
+            "rememberName": rememberName
+        }
+
+        const result = await db.add(entity, 'receiveaccount');
+        // const loadReceiveUser = await db.load(`SELECT * FROM receiveaccount WHERE accountNumber = ${accountNumber}`);
+        return result;
+    },
+
+    loadContactWithAccountNumber: (accountNumber) => {
+        return db.load(`SELECT * FROM receiveaccount WHERE accountNumber = ${accountNumber}`)
+    },
+
+    addContact: async (userId, receiveUserID) => {
+        const entity = {
+            "userID": userId,
+            "receiveUserID": receiveUserID
+        }
+
+        
+        const result = await db.add(entity, 'users_add_users');
+        return result;
+    },
+
+    showUserContact: userId => {
+        return db.load(`SELECT receiveaccount.accountNumber, receiveaccount.rememberName FROM receiveaccount JOIN users_add_users ON receiveaccount.id = users_add_users.receiveUserID WHERE users_add_users.userID = ${userId}`);
     }
 }
