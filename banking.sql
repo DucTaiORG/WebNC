@@ -2,10 +2,10 @@
 -- version 5.0.1
 -- https://www.phpmyadmin.net/
 --
--- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 16, 2020 lúc 05:11 PM
--- Phiên bản máy phục vụ: 10.4.11-MariaDB
--- Phiên bản PHP: 7.4.2
+-- Host: localhost
+-- Generation Time: Jun 20, 2020 at 03:14 AM
+-- Server version: 10.4.11-MariaDB
+-- PHP Version: 7.2.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -19,13 +19,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Cơ sở dữ liệu: `banking`
+-- Database: `banking`
 --
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `deposit_history`
+-- Table structure for table `deposit_history`
 --
 
 CREATE TABLE `deposit_history` (
@@ -36,7 +36,7 @@ CREATE TABLE `deposit_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Đang đổ dữ liệu cho bảng `deposit_history`
+-- Dumping data for table `deposit_history`
 --
 
 INSERT INTO `deposit_history` (`id`, `deposit_time`, `money_amount`, `account_num`) VALUES
@@ -48,7 +48,26 @@ INSERT INTO `deposit_history` (`id`, `deposit_time`, `money_amount`, `account_nu
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `partnerbank`
+-- Table structure for table `nganhanglienket`
+--
+
+CREATE TABLE `nganhanglienket` (
+  `id` int(11) NOT NULL,
+  `code` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `nganhanglienket`
+--
+
+INSERT INTO `nganhanglienket` (`id`, `code`) VALUES
+(1, 'B'),
+(2, 'C');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `partnerbank`
 --
 
 CREATE TABLE `partnerbank` (
@@ -60,7 +79,7 @@ CREATE TABLE `partnerbank` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Đang đổ dữ liệu cho bảng `partnerbank`
+-- Dumping data for table `partnerbank`
 --
 
 INSERT INTO `partnerbank` (`id`, `name`, `partnerCode`, `secretKey`, `publicKey`) VALUES
@@ -71,7 +90,7 @@ INSERT INTO `partnerbank` (`id`, `name`, `partnerCode`, `secretKey`, `publicKey`
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `partner_transfer_history`
+-- Table structure for table `partner_transfer_history`
 --
 
 CREATE TABLE `partner_transfer_history` (
@@ -83,7 +102,7 @@ CREATE TABLE `partner_transfer_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Đang đổ dữ liệu cho bảng `partner_transfer_history`
+-- Dumping data for table `partner_transfer_history`
 --
 
 INSERT INTO `partner_transfer_history` (`id`, `partnerId`, `money_amount`, `transfer_time`, `signature`) VALUES
@@ -102,7 +121,7 @@ INSERT INTO `partner_transfer_history` (`id`, `partnerId`, `money_amount`, `tran
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `paymentaccount`
+-- Table structure for table `paymentaccount`
 --
 
 CREATE TABLE `paymentaccount` (
@@ -113,17 +132,43 @@ CREATE TABLE `paymentaccount` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Đang đổ dữ liệu cho bảng `paymentaccount`
+-- Dumping data for table `paymentaccount`
 --
 
 INSERT INTO `paymentaccount` (`id`, `userId`, `balance`, `accountNumber`) VALUES
-(1, 10, 11000, 123456789),
-(2, 18, 470000, 794351225);
+(1, 1, 1031599, 123456789),
+(2, 18, 0, 794351225);
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `savingaccount`
+-- Table structure for table `receiveaccount`
+--
+
+CREATE TABLE `receiveaccount` (
+  `id` int(11) NOT NULL,
+  `accountNumber` int(11) NOT NULL,
+  `rememberName` text CHARACTER SET utf8 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `receiveaccount`
+--
+
+INSERT INTO `receiveaccount` (`id`, `accountNumber`, `rememberName`) VALUES
+(13, 321, 'phat'),
+(15, 123, 'phat'),
+(16, 111, 'phat'),
+(18, 112, 'phat'),
+(19, 113, 'phat'),
+(20, 114, 'phat'),
+(23, 114, 'phat ho'),
+(24, 115, 'bin');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `savingaccount`
 --
 
 CREATE TABLE `savingaccount` (
@@ -133,18 +178,66 @@ CREATE TABLE `savingaccount` (
   `accountNumber` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
 --
--- Đang đổ dữ liệu cho bảng `savingaccount`
+-- Table structure for table `taikhoan`
 --
 
-INSERT INTO `savingaccount` (`id`, `userId`, `balance`, `accountNumber`) VALUES
-(1, 18, 10000, 797083952),
-(2, 18, 200000, 132746691);
+CREATE TABLE `taikhoan` (
+  `id` int(11) NOT NULL,
+  `SoTaiKhoan` text NOT NULL,
+  `NgaySinh` date NOT NULL,
+  `TenDangNhap` text NOT NULL,
+  `MatKhau` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `taikhoan`
+--
+
+INSERT INTO `taikhoan` (`id`, `SoTaiKhoan`, `NgaySinh`, `TenDangNhap`, `MatKhau`) VALUES
+(1, '123456789', '0000-00-00', 'ductai', '123456'),
+(2, '1234567812', '2020-05-22', 'ductai1', '123');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `transfer_history`
+-- Table structure for table `taikhoanthanhtoan`
+--
+
+CREATE TABLE `taikhoanthanhtoan` (
+  `id` int(11) NOT NULL,
+  `SoTaiKhoan` text NOT NULL,
+  `SoDu` text NOT NULL,
+  `idTaiKhoan` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `taikhoanthanhtoan`
+--
+
+INSERT INTO `taikhoanthanhtoan` (`id`, `SoTaiKhoan`, `SoDu`, `idTaiKhoan`) VALUES
+(1, '012345678', '1000000', 1),
+(2, '123456781', '1500000', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `taikhoantietkiem`
+--
+
+CREATE TABLE `taikhoantietkiem` (
+  `id` int(11) NOT NULL,
+  `SoTaiKhoan` text NOT NULL,
+  `SoDu` text NOT NULL,
+  `idTaiKhoan` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transfer_history`
 --
 
 CREATE TABLE `transfer_history` (
@@ -155,22 +248,10 @@ CREATE TABLE `transfer_history` (
   `time` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Đang đổ dữ liệu cho bảng `transfer_history`
---
-
-INSERT INTO `transfer_history` (`id`, `money_amount`, `from_account`, `to_account`, `time`) VALUES
-(1, 10000, '794351225', '123456789', '2020-06-16 22:03:20'),
-(2, 12345, '794351225', '123456789', '2020-06-16 22:08:27'),
-(3, 80000, '794351225', '123456789', '2020-06-16 22:08:39'),
-(4, 70000, '794351225', '123456789', '2020-06-16 22:08:54'),
-(5, 60000, '794351225', '123456789', '2020-06-16 22:09:13'),
-(6, 10000, '794351225', '123456789', '2020-06-16 22:10:54');
-
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -187,108 +268,208 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Đang đổ dữ liệu cho bảng `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `fullname`, `phoneNo`, `dateOfBirth`, `userRole`, `refreshToken`, `rdt`) VALUES
-(1, 'ductai', '$2a$08$EGbafBgBJd95a2DYKxp7MeVw6CGnIzdZNWfwodggKWRLpTRGiNVOO', '', 'Lâm Đức Tài', '0123456789', '0000-00-00', 3, 'XX16H7bLSMqNt3vvHf3lYz2aMDPASXzbgKV2Rf0XRqmrh960whb18zpDgDo3l3PE45oP1k0GwuRE8Uyx', '2020-06-15 22:21:12'),
-(8, 'employee', '$2a$08$Oxz2ZVIVx/nVL02q9iUmiOYVaGIFbtv0y/SMQrdHG/aWPAK6aP20C', '', 'Đức Tài', '0123456789', '0000-00-00', 2, 'tWxuyPoxiyAnEit4YByV5ngEDandT6lQEBP0MPdasDsjQL860V9dDdN0ZRGMq5JJe6XEuavJ996Dhns1', '2020-06-16 22:10:02'),
+(1, 'ductai', '$2a$08$EGbafBgBJd95a2DYKxp7MeVw6CGnIzdZNWfwodggKWRLpTRGiNVOO', '', 'Lâm Đức Tài', '0123456789', '0000-00-00', 3, 'XGQti5u8FaQn4Qyxq19LZogCl0a3KD8Dk3URW4XoUOOOrkhqIWAii12d0PnbD9DE1WBWjYaqjIDvWm4V', '2020-06-17 18:25:30'),
+(8, 'employee', '$2a$08$Oxz2ZVIVx/nVL02q9iUmiOYVaGIFbtv0y/SMQrdHG/aWPAK6aP20C', '', 'Đức Tài', '0123456789', '0000-00-00', 2, 'SybAjDl8G2Jy9wTM8Noo6cQee4K8cUn1GWLOwUfGONWijjFyhiYgQScjwbSv6GrjcFCFtHQcLA7Z6Inw', '2020-06-15 17:40:10'),
 (9, 'ductai2', '$2a$08$bb0D1Y8DVNnJUrJeURWNaerRQBRsOAW5RZlic3GX55E1UDaUIWkQa', '', 'Đức Tài', '0123456789', '0000-00-00', 1, '', '0000-00-00 00:00:00'),
-(10, 'user123', '$2a$08$6MWkNBjZLtl2owwhtMcinevshAAxyrDsWP0V6odCg7CVnqqASo6Yu', '', 'Tài Đức', '0908960580', '0000-00-00', 1, '', '0000-00-00 00:00:00'),
+(10, 'user123', '$2a$08$6MWkNBjZLtl2owwhtMcinevshAAxyrDsWP0V6odCg7CVnqqASo6Yu', '', 'Tài Đức', '0908960580', '0000-00-00', 1, 'cZvFtdgJy6zoSNl6H2JFQYDTQmF9BJglaTymIzlOzyzvs26X2ZWpssD68W7DvMsAySZrBd52eRMN27de', '2020-06-20 07:37:55'),
 (11, 'employee1', '$2a$08$maIUJsX67lsKLRWQ2PuiC.UPUDrMeU/zYkExpDIBqdqhpoMdFw4Su', 'nva@gmail.com', 'Nguyễn Văn A', '0908960580', '2020-06-10', 2, '', '0000-00-00 00:00:00'),
-(18, 'customer1', '$2a$08$xvk3jhXw606O7WXzrGR.VusFMr2TwlqbxcqtvSeeFSPq.CZdb4H6K', '', 'Nguyễn Văn C', '0123456789', '0000-00-00', 1, 'QMVC5MUCPe4Ef5bO9HqWhzpkX7S7uFWaHc16PwUo0bgfGlx95wMWqytHeM02ezDiTwRPvVbxfrT0JWAI', '2020-06-16 22:10:32');
+(18, 'customer1', '$2a$08$xvk3jhXw606O7WXzrGR.VusFMr2TwlqbxcqtvSeeFSPq.CZdb4H6K', '', 'Nguyễn Văn C', '0123456789', '0000-00-00', 1, '', '0000-00-00 00:00:00');
+
+-- --------------------------------------------------------
 
 --
--- Chỉ mục cho các bảng đã đổ
+-- Table structure for table `users_add_users`
+--
+
+CREATE TABLE `users_add_users` (
+  `userID` int(11) NOT NULL,
+  `receiveUserID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `users_add_users`
+--
+
+INSERT INTO `users_add_users` (`userID`, `receiveUserID`) VALUES
+(1, 20),
+(1, 24),
+(18, 20);
+
+--
+-- Indexes for dumped tables
 --
 
 --
--- Chỉ mục cho bảng `deposit_history`
+-- Indexes for table `deposit_history`
 --
 ALTER TABLE `deposit_history`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `partnerbank`
+-- Indexes for table `nganhanglienket`
+--
+ALTER TABLE `nganhanglienket`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `partnerbank`
 --
 ALTER TABLE `partnerbank`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `partner_transfer_history`
+-- Indexes for table `partner_transfer_history`
 --
 ALTER TABLE `partner_transfer_history`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `paymentaccount`
+-- Indexes for table `paymentaccount`
 --
 ALTER TABLE `paymentaccount`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `userId` (`userId`);
 
 --
--- Chỉ mục cho bảng `savingaccount`
+-- Indexes for table `receiveaccount`
+--
+ALTER TABLE `receiveaccount`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `accountNumber` (`accountNumber`) USING BTREE;
+
+--
+-- Indexes for table `savingaccount`
 --
 ALTER TABLE `savingaccount`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `transfer_history`
+-- Indexes for table `taikhoan`
+--
+ALTER TABLE `taikhoan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `taikhoanthanhtoan`
+--
+ALTER TABLE `taikhoanthanhtoan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `taikhoantietkiem`
+--
+ALTER TABLE `taikhoantietkiem`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `transfer_history`
 --
 ALTER TABLE `transfer_history`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT cho các bảng đã đổ
+-- Indexes for table `users_add_users`
+--
+ALTER TABLE `users_add_users`
+  ADD PRIMARY KEY (`userID`,`receiveUserID`),
+  ADD KEY `FK_userId_receiveaccount` (`receiveUserID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT cho bảng `deposit_history`
+-- AUTO_INCREMENT for table `deposit_history`
 --
 ALTER TABLE `deposit_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT cho bảng `partnerbank`
+-- AUTO_INCREMENT for table `nganhanglienket`
+--
+ALTER TABLE `nganhanglienket`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `partnerbank`
 --
 ALTER TABLE `partnerbank`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT cho bảng `partner_transfer_history`
+-- AUTO_INCREMENT for table `partner_transfer_history`
 --
 ALTER TABLE `partner_transfer_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT cho bảng `paymentaccount`
+-- AUTO_INCREMENT for table `paymentaccount`
 --
 ALTER TABLE `paymentaccount`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT cho bảng `savingaccount`
+-- AUTO_INCREMENT for table `receiveaccount`
+--
+ALTER TABLE `receiveaccount`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `savingaccount`
 --
 ALTER TABLE `savingaccount`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `taikhoan`
+--
+ALTER TABLE `taikhoan`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT cho bảng `transfer_history`
+-- AUTO_INCREMENT for table `taikhoanthanhtoan`
 --
-ALTER TABLE `transfer_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+ALTER TABLE `taikhoanthanhtoan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT cho bảng `users`
+-- AUTO_INCREMENT for table `taikhoantietkiem`
+--
+ALTER TABLE `taikhoantietkiem`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `transfer_history`
+--
+ALTER TABLE `transfer_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `users_add_users`
+--
+ALTER TABLE `users_add_users`
+  ADD CONSTRAINT `FK_userId_receiveaccount` FOREIGN KEY (`receiveUserID`) REFERENCES `receiveaccount` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_userId_users` FOREIGN KEY (`userID`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
