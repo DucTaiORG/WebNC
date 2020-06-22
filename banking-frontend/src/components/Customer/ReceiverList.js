@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import AccountRow from './AccountRow';
 import axios from 'axios';
-import moment from 'moment';
+import { Table } from 'react-bootstrap';
 
 export default class ReceiverList extends Component {
 
@@ -9,7 +10,21 @@ export default class ReceiverList extends Component {
     this.state = {
       rememberName: '',
       accountNumber: 0,
+      list: [{
+        mRememberName: '',
+        mAccountNumber: 0,
+      }]
     }
+  }
+
+  componentDidMount() {
+    const userId = localStorage.getItem('userId');
+    axios.get(`http://localhost:8080/contact/${userId}`).then((response) => {
+      const contactList = [...response.data];
+      this.setState({ list: contactList });
+    }).catch(error => {
+      console.log(error);
+    });
   }
 
   handleAddContact = e => {
@@ -25,13 +40,23 @@ export default class ReceiverList extends Component {
     }
 
 
-
-    axios.post(`http://localhost:8080/contact/${userId}/add`, this.state).then((response) => {
+    const submitForm = this.state;
+    const rememberName = submitForm.rememberName;
+    const accountNumber = submitForm.accountNumber;
+    const entity = {
+      rememberName,
+      accountNumber
+    }
+    axios.post(`http://localhost:8080/contact/${userId}/add`, entity).then((response) => {
       console.log(response.data);
       alert("Added Successfully");
+      axios.get(`http://localhost:8080/contact/${userId}`).then((response) => {
+        const contactList = [...response.data];
+        this.setState({ list: contactList });
+      }).catch(error => {
+        console.log(error);
+      });
     })
-
-
   }
 
   handleInputChange = (e) => {
@@ -57,8 +82,29 @@ export default class ReceiverList extends Component {
               <input type="submit" value="Add" className="btn btn-primary" />
             </div>
           </form>
-        </div>
 
+          <div className="customer-content">
+            <Table striped bordered hover className="customer-inner">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Remember Name</th>
+                  <th>Account Number</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  
+                  this.state.list.map((object, index) => (
+                    
+                    <AccountRow position={index + 1} obj={object} key={index} />
+                  ))
+                }
+              </tbody>
+            </Table>
+          </div>
+
+        </div>
       </div>
     )
   }
