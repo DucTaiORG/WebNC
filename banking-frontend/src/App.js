@@ -10,6 +10,8 @@ import Admin from './components/Admin/Admin';
 import Employee from './components/Employee/Employee';
 import Customer from './components/Customer/Customer';
 import {ProtectedRoute} from './components/RouterURL/ProtectedRoute';
+import { loadReCaptcha } from 'react-recaptcha-google'
+
 
 class App extends Component {
   constructor(props){
@@ -17,6 +19,10 @@ class App extends Component {
     this.state = {
       userRole: 'public',
     }
+  }
+
+  componentDidMount(){
+    loadReCaptcha();
   }
 
   checkLogin = (name) =>{
