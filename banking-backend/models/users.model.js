@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const randToken = require('rand-token');
 
-module.exports = {
+const self = module.exports = {
     all: _ => db.load('select users.id, users.fullname, users.dateOfBirth, users.username, users.userRole' 
                         + ' from users'),
 
@@ -117,11 +117,11 @@ module.exports = {
     },
 
     getDepositHistory: userId => {
-        return db.load(`SELECT deposit_history.money_amount, deposit_history.account_num, deposit_history.deposit_time from users 
+        return db.load(`SELECT deposit_history.money_amount, deposit_history.account_num, deposit_history.time from users 
                             JOIN paymentaccount ON users.id = paymentaccount.userId 
                             JOIN deposit_history ON deposit_history.account_num = paymentaccount.accountNumber
                                 WHERE users.id = ${userId} 
-                                    ORDER BY deposit_history.deposit_time DESC`);
+                                    ORDER BY deposit_history.time DESC`);
     },
 
     getTransferHistory: userId =>{
@@ -131,5 +131,22 @@ module.exports = {
                                 WHERE users.id = ${userId} AND transfer_history.isSuccess = true
                                     GROUP BY transfer_history.time
                                     ORDER BY transfer_history.time DESC`);
+    },
+
+    addDebt: async (lenderAcc, debtorAcc, money, content)=>{
+        const debtor = await self.detailByAccNumber(debtorAcc);
+        if(debtor.length == 0){
+            return null;
+        }
+
+        const entity = {
+            lender: lenderAcc,
+            debtor: debtorAcc,
+            money_amount: money,
+            content,
+            time: moment().format('YYYY-MM-DD HH:mm:ss')
+        }
+
+        return db.add(entity, 'debt');
     }
 }

@@ -51,6 +51,17 @@ router.post('/depositHistory', async (req, res)=>{
     return res.json(ret);
 });
 
+router.post('/addDebt', async (req, res)=>{
+    console.log(req.body);
+    const {fromAcc, toAcc, moneyAmount, content} = req.body;
+    const ret = await userModel.addDebt(fromAcc, toAcc, moneyAmount, content);
+    
+    if(ret == null){
+        return res.status(204).end();
+    }
+    
+    return res.json({success: true});
+});
 
 
 module.exports = router;

@@ -1,11 +1,10 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
+import moment from 'moment';
 import AccountRow from './AccountRow2';
 import {Table, Dropdown, DropdownButton} from 'react-bootstrap';
 import Receiver from './Receiver';
 import jwt_decode from 'jwt-decode';
-import TransferModal from './TransferModal';
-import './Customer.css';
 
 try {
     console.log(localStorage.getItem('accessToken'));
@@ -18,42 +17,46 @@ const formValid = formErrors =>{
     let valid  = true;
     Object.values(formErrors).forEach(val=>val.length>0 && (valid=false));
     return valid;
-};
+}
 
-export default class DepositMoney extends Component{
+
+export default class CreateDebt extends Component {
     constructor(props){
         super(props);
         this.state = {
             toAccount: '',
             moneyAmount: '',
+            content: '',
             formErrors:{
                 toAccount: '',
                 moneyAmount: ''
             },
+            
             loggedAccount:{
                 accountNumber: 123456789,
                 balance: 10000
             },
+
+            debtor:{
+                accountNumber: '',
+                fullname: '',
+                phoneNo: '',
+                dateOfBirth: ''
+            },
+
             receiverList:[
                 {
-                    accountNumber: 113333333,
-                    fullname: 'Bành Thị A'
+                    accountNumber: 123456789,
+                    fullname: 'Tài Đức'
                 },
                 {
                     accountNumber: 112222222,
                     fullname: 'Bành Thị B'
                 }
             ],
-            receiver:{
-                accountNumber: '',
-                fullname: '',
-                phoneNo: '',
-                dateOfBirth: ''
-            },
+
             selectedName: 'From list',
-            transferFeeType: 1,
-            showModal: false
-        }
+        };
     }
 
     componentDidMount(){
@@ -88,10 +91,59 @@ export default class DepositMoney extends Component{
         });
     }
 
+    handleSubmitForm = e =>{
+        e.preventDefault();
+        const state = this.state;
+        console.log(state);
+        
+        if(formValid(this.state.formErrors)){
+            this.setState({showModal: true});
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+            const postBody = {
+                accessToken,
+                refreshToken
+            }
+
+            axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
+                if(response.data.accessToken){
+                    localStorage.setItem('accessToken', response.data.accessToken);
+
+                    const submitForm = {
+                        fromAcc: state.loggedAccount.accountNumber,
+                        toAcc: state.toAccount,
+                        moneyAmount: state.moneyAmount,
+                        content: state.content
+                    };
+
+                    const config = {
+                        headers: {
+                            'x-access-token' : localStorage.getItem('accessToken')
+                        }
+                    }
+
+                    axios.post('http://localhost:8080/user/addDebt', submitForm, config).then((response)=>{
+                        console.log(response);
+                        if(response.data.success){
+                            alert(`Add debt success`);
+                        }else{
+                            alert(`Add debt fail: account number not found`);
+                        }
+                    }).catch((error)=>{
+                        console.log(error.response);
+                        alert(`Add debt fail: ${error.response.data.error}`);
+                    });
+                }
+            }).catch((error) => {
+                console.log(error.response);
+            });
+        }else{
+            alert("Invalid form");
+        }
+    }
 
     handleInputChange = e =>{
         e.preventDefault();
-        console.log("Transfer Input change");
         const {name, value} = e.target;
         let formErrors = this.state.formErrors;
 
@@ -114,9 +166,9 @@ export default class DepositMoney extends Component{
                         formErrors.moneyAmount = "";
                     }
                 }
-                
                 break;
         }
+
         this.setState({formErrors, [name]: value});
 
         if(formValid(formErrors)){
@@ -141,7 +193,7 @@ export default class DepositMoney extends Component{
                     axios.get('http://localhost:8080/user/byAccountNum/' + this.state.toAccount, config).then(response => {
                         console.log(response);
                         const responseData = {...response.data};
-                        this.setState({receiver: responseData});
+                        this.setState({debtor: responseData});
                     }).catch(error=>{
                         console.log(error);
                     });
@@ -150,52 +202,9 @@ export default class DepositMoney extends Component{
                 console.log(error.response);
             });
         }else{
-            this.setState({receiver: null});
+            this.setState({debtor: null});
         }
-    }
-
-    handleSubmitForm = e => {
-        e.preventDefault();
-        const state = this.state;
-        if(formValid(this.state.formErrors)){
-            this.setState({showModal: true});
-            const accessToken = localStorage.getItem('accessToken');
-            const refreshToken = localStorage.getItem('refreshToken');
-            const postBody = {
-                accessToken,
-                refreshToken
-            }
-
-            axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
-                if(response.data.accessToken){
-                    localStorage.setItem('accessToken', response.data.accessToken);
-
-                    const submitForm = {
-                        fromAcc: state.loggedAccount.accountNumber,
-                        toAcc: state.toAccount,
-                        moneyAmount: state.moneyAmount,
-                        transferFeeType: state.transferFeeType
-                    };
-
-                    const config = {
-                        headers: {
-                            'x-access-token' : localStorage.getItem('accessToken')
-                        }
-                    }
-
-                    axios.post('http://localhost:8080/transfer/addHistory', submitForm, config).then((response)=>{
-                        console.log(response);
-                    }).catch((error)=>{
-                        console.log(error.response);
-                        alert(`Transfer fail: ${error.response.data.error}`);
-                    });
-                }
-            }).catch((error) => {
-                console.log(error.response);
-            });
-        }else{
-            alert("Invalid form");
-        }
+        
     }
 
     handleItemSelect = (eventKey, event)=>{
@@ -210,79 +219,17 @@ export default class DepositMoney extends Component{
         axios.get('http://localhost:8080/user/byAccountNum/' + eventKey, config).then(response => {
             console.log(response);
             const responseData = {...response.data};
-            this.setState({receiver: responseData});
+            this.setState({debtor: responseData});
         }).catch(error=>{
             console.log(error);
         });
     }
-
-    handleRadioButton = (event)=>{
-        this.setState({transferFeeType: event.target.value}, ()=>console.log(this.state.transferFeeType));
-    }
-
-    handleCloseModal = ()=>{
-        this.setState({showModal: false});
-    }
-
-    handleSubmitModal = (otp)=>{
-        console.log('otp: '+ otp);
-        const state = this.state;
-        const submitVerify = {
-            fromAcc: state.loggedAccount.accountNumber,
-            otpNum: otp
-        };
-
-        const submitTransfer = {
-            fromAcc: this.state.loggedAccount.accountNumber,
-            toAcc: this.state.toAccount,
-            moneyAmount: this.state.moneyAmount,
-            transferFeeType: this.state.transferFeeType,
-            otpNum: otp
-        }
-
-        const config = {
-            headers: {
-                'x-access-token' : localStorage.getItem('accessToken')
-            }
-        }
-
-        axios.post('http://localhost:8080/transfer/verify', submitVerify, config).then((response)=>{
-            console.log(response);
-            if(response.data.success){
-                axios.post('http://localhost:8080/transfer', submitTransfer, config).then(response => {
-                    if(response.data.success){
-                        axios.get('http://localhost:8080/user/byUserId/' + userId, config).then(response => {
-                            console.log(response);
-                            const responseData = {...response.data};
-                            this.setState({loggedAccount: responseData});
-                        }).catch(error=>{
-                            console.log(error);
-                        });
-                        alert('Transfer successful');
-                    }
-                }).catch(error => {
-                    console.log(error.response);
-                });
-            }else{
-                alert('Verify fail!');
-            }
-        }).catch((error)=>{
-            console.log(error.response);
-            alert(`Transfer fail`);
-        });
-        
-        this.setState({
-            toAccount: "",
-            moneyAmount: "",
-            showModal: false
-        });
-    }
-
-    render(){
+    
+    render() {
         const {formErrors} = this.state;
         return (
             <div className="customer-content">
-                <h1>Transfer Money</h1>
+                <h1>Create debt reminder</h1>
                 <div className="customer-inner">
                     <Table striped bordered hover>
                         <thead>
@@ -305,7 +252,7 @@ export default class DepositMoney extends Component{
                             </tr>
                         </thead>
                         <tbody>
-                            {this.state.receiver !== null ? <Receiver obj={this.state.receiver}/> : null}
+                            {this.state.debtor !== null ? <Receiver obj={this.state.debtor}/> : null}
                         </tbody>
                     </Table>
                     <form onSubmit={this.handleSubmitForm}>
@@ -330,21 +277,15 @@ export default class DepositMoney extends Component{
                             {formErrors.moneyAmount.length > 0 ? <span style={{color: 'red'}}>{formErrors.moneyAmount}</span>:null}
                         </div>
 
-                        <div>
-                            <div className="radio">
-                                <label><input type="radio" name="feeType" value={1} defaultChecked onClick={this.handleRadioButton} style={{marginRight: 10}}/>Sender bear fee</label>
-                            </div>
-
-                            <div className="radio">
-                                <label><input type="radio" name="feeType" value={2} onClick={this.handleRadioButton} style={{marginRight: 10}}/>Receiver bear fee</label>
-                            </div>
+                        <div className="form-group">
+                            <label>Debt content</label>
+                            <input type="text" name="content" value={this.state.content} className="form-control customer-input" placeholder="Enter money amount" onChange={this.handleInputChange}/>
                         </div>
+                        
                         <button type="submit" className="btn btn-primary btn-block submit-button-customer">Submit</button>
                     </form>
                 </div>
-
-                <TransferModal show={this.state.showModal} closemodal={this.handleCloseModal} submitmodal={this.handleSubmitModal}/>
             </div>
         );
     }
-} 
+}

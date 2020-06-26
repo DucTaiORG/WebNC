@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Auth from '../../auth';
 import './Login.css';
 import { ReCaptcha } from 'react-recaptcha-google'
+import { Link } from "react-router-dom";
 
 export default class Login extends Component {
     constructor(props, context) {
@@ -9,7 +10,7 @@ export default class Login extends Component {
         this.state = {
             username: '',
             password: '',
-            disableSubmit: true
+            disableSubmit: false
         }
         this.onLoadRecaptcha = this.onLoadRecaptcha.bind(this);
         this.verifyCallback = this.verifyCallback.bind(this);
@@ -72,22 +73,23 @@ export default class Login extends Component {
                             </div>
                         </div>
 
-                        <button disabled={this.state.disableSubmit} type="submit" className="btn btn-primary btn-block">Submit</button>
-                        <p className="forgot-password text-right">
-                            Forgot <a href="#">password?</a>
-                        </p>
-
-                        <br />
-
-                        <ReCaptcha
+                        {/* <ReCaptcha
                             ref={(el) => { this.captchaDemo = el; }}
                             size="normal"
                             data-theme="dark"
                             render="explicit"
-                            sitekey="6LcMCKgZAAAAAOcDeGi0CZQkzteLpqC_2ICzn26n"
+                            sitekey="6Ldh3KkZAAAAALhoXE8JmLbHjOTANYkzO1S48sRO"
                             onloadCallback={this.onLoadRecaptcha}
                             verifyCallback={this.verifyCallback}
-                        />
+                        /> */}
+
+                        <button disabled={this.state.disableSubmit} type="submit" className="btn btn-primary btn-block">Submit</button>
+                        <p className="forgot-password text-right">
+                            <Link>Forgot password?</Link>
+                        </p>
+
+                        <br />
+
                     </form>
                 </div>
             </div>

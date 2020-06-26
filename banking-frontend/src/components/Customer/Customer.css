@@ -35,14 +35,3 @@
     margin: auto;
     max-width: 300px;
 }
-
-table tbody, table thead
-{
-    display: block;
-}
-
-table tbody 
-{
-   overflow: auto;
-   height: 200px;
-}

@@ -8,24 +8,6 @@ const formValid = formErrors =>{
     return valid;
 }
 
-const refresh = (cb) =>{
-    const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
-
-    const postBody = {
-        accessToken,
-        refreshToken
-    }
-
-    axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
-        if(response.data.accessToken){
-            localStorage.setItem('accessToken', response.data.accessToken);
-        }
-        cb()
-    }).catch((error) => {
-        console.log(error.response);
-    })
-}
 
 export default class CreateEmployee extends Component {
     constructor(props){
