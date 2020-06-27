@@ -2,6 +2,7 @@ const db = require('../utils/db');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const randToken = require('rand-token');
+const config = require('../config/default.json');
 
 const self = module.exports = {
     all: _ => db.load('select users.id, users.fullname, users.dateOfBirth, users.username, users.userRole' 
@@ -10,7 +11,7 @@ const self = module.exports = {
     detailByAccNumber: accNo => db.load(`select paymentaccount.accountNumber, users.fullname, users.phoneNo, users.dateOfBirth, users.email
                                 from users join paymentaccount on users.id = paymentaccount.userId  where paymentaccount.accountNumber = ${accNo}`),
 
-    detailByUserId: id => db.load(`select users.id, paymentaccount.accountNumber, users.fullname, users.phoneNo, users.dateOfBirth 
+    detailByUserId: id => db.load(`select users.id, paymentaccount.accountNumber, users.fullname, users.phoneNo, users.dateOfBirth, users.email
                                     from users join paymentaccount on users.id = paymentaccount.userId  where users.id = ${id}`),
 
     detailBalanceByUserId: id => db.load(`select users.id, paymentaccount.accountNumber, paymentaccount.balance 
@@ -148,5 +149,111 @@ const self = module.exports = {
         }
 
         return db.add(entity, 'debt');
+    },
+
+    getAllDebtByUserId: async (userId)=>{
+        return db.load(`SELECT debt.id, debt.lender, debt.debtor, debt.money_amount, debt.content, debt.time, debt.status from users 
+                            JOIN paymentaccount ON users.id = paymentaccount.userId 
+                            JOIN debt ON debt.lender = paymentaccount.accountNumber OR debt.debtor = paymentaccount.accountNumber
+                                WHERE users.id = ${userId}
+                                GROUP BY debt.time
+                                ORDER BY debt.time DESC`);
+    },
+
+    getDebtById: id =>{
+        return db.load(`SELECT  * FROM debt WHERE id = ${id}`);
+    },
+
+    addPaydebtHistory: async (debtId, userId) => {
+        const ret = await self.getDebtById(debtId);
+        if(ret.length == 0){
+            return null;
+        }
+
+        const {lender, debtor} = ret[0];
+        const user = await self.singleByAccountNumber(debtor);
+        console.log(user);
+        
+        if(user[0].userId != userId){
+            console.log("not debtor");
+            return 1;
+        }
+        
+        const otpNumber = randToken.generator({
+            chars: '123456789'
+        }).generate(6);
+
+        const entity = {
+            debtId,
+            time: moment().format('YYYY-MM-DD HH:mm:ss'),
+            otp_number: otpNumber,
+            isSuccess: false
+        };
+
+        const result = await db.add(entity, 'pay_debt_history');
+        if(result.insertId){
+            return otpNumber;
+        }
+        return null;
+    },
+
+    verifyPayOTP: async otpNum => {
+        const otp = Number(otpNum);
+        const transferList = await db.load(`select * from pay_debt_history where otp_number = ${otp} and otp_number != 0`);
+        if(transferList.length == 0){
+            return false;
+        }
+        return true;
+    },
+
+    payDebt: async (debtId, userId, otp) => {
+        const rowsDebt = await self.getDebtById(debtId);
+        
+        const {lender, debtor, money_amount} = rowsDebt[0];
+
+        const ret = await self.getDebtById(debtId);
+        if(ret.length == 0){
+            return null;
+        }
+
+        const user = await self.singleByAccountNumber(debtor);
+        if(user[0].userId != userId){
+            console.log("not debtor");
+            return 1;
+        }
+
+        const toAccount = await self.singleByAccountNumber(lender);
+        if(toAccount.length === 0){
+            return null;
+        }
+
+        const fromAccount = await self.singleByAccountNumber(debtor);
+        if(fromAccount.length === 0){
+            return null;
+        }
+
+        const fromAccBalance = fromAccount[0].balance;
+        const toAccBalance = toAccount[0].balance;
+
+        const fromAccUpdateMoney = fromAccBalance - money_amount - config.transferFee;
+
+        if(fromAccUpdateMoney < 0){
+            return 2;
+        }
+
+        const historyUpdate = await db.update('pay_debt_history', {"otp_number": 0, "isSuccess": true}, {"otp_number": otp});
+        const debtUpdate = await db.update('debt', {"status": 1}, {"id": debtId});
+
+        if(debtUpdate.affectedRows === 0){
+            return 2;
+        }
+
+        if(historyUpdate.affectedRows === 0){
+            return 2;
+        }
+        
+        await db.update('paymentaccount', {"balance": fromAccUpdateMoney}, {"accountNumber": debtor});
+        const toAccUpdateMoney = money_amount + toAccBalance;
+        return db.update('paymentaccount', {"balance": toAccUpdateMoney}, {"accountNumber": lender});
     }
 }

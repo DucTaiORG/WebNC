@@ -13,6 +13,7 @@ module.exports = {
                     return;
                 }
                 const {userId} = payload;
+                req.body.userId = userId;
                 const rows = await userModel.singleByUserId(userId);
                 const userRole = rows[0].userRole;
                 if(userRole !== 1){

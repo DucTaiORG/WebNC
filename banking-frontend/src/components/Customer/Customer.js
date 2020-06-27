@@ -19,7 +19,7 @@ export default class Customer extends Component{
                     <hr/>
                     <Link to="/customer/history">Transaction History</Link>
                     <hr/>
-                    <Link to="/customer/debt">Debt Management</Link>
+                    <Link to="/customer/debt/index">Debt Management</Link>
                 </div>
                 
                 <Route path='/customer/account' component={AccountList}/>
