@@ -117,6 +117,14 @@ const self = module.exports = {
         return db.load(`SELECT receiveaccount.accountNumber, receiveaccount.rememberName FROM receiveaccount JOIN users_add_users ON receiveaccount.id = users_add_users.receiveUserID WHERE users_add_users.userID = ${userId}`);
     },
 
+    deleteUsersAddUsers: (userId, receiveUserID) => {
+        return db.load(`DELETE FROM users_add_users WHERE users_add_users.userID = '${userId}' AND users_add_users.receiveUserID = '${receiveUserID}'`);
+    },
+
+    deleteContact: id => {
+       return db.load(`DELETE FROM receiveaccount WHERE receiveaccount.id = '${id}'`)
+    },
+
     getDepositHistory: userId => {
         return db.load(`SELECT deposit_history.money_amount, deposit_history.account_num, deposit_history.time from users 
                             JOIN paymentaccount ON users.id = paymentaccount.userId 

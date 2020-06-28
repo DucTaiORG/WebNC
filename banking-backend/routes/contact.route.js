@@ -15,5 +15,11 @@ router.get('/:id', async(req, res) => {
     return res.json(result);
 })
 
+router.post('/:id/delete', async(req, res) => {
+    const deleteUsersAddUsers = await userModel.deleteUsersAddUsers(req.params.id, req.body.receiveUserID);
+    const result = await userModel.deleteContact(req.body.receiveUserID);
+    return res.json(result);
+})
+
 
 module.exports = router;
