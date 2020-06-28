@@ -125,8 +125,8 @@ const self = module.exports = {
         return db.load(`DELETE FROM users_add_users WHERE users_add_users.userID = '${userId}' AND users_add_users.receiveUserID = '${receiveUserID}'`);
     },
 
-    deleteContact: id => {
-       return db.load(`DELETE FROM receiveaccount WHERE receiveaccount.id = '${id}'`)
+    deleteContact: receiveUserID => {
+       return db.load(`DELETE FROM receiveaccount WHERE receiveaccount.id = '${receiveUserID}'`)
     },
 
     getDepositHistory: userId => {
