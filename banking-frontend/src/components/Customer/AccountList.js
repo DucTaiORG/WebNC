@@ -5,15 +5,14 @@ import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import './Customer.css';
 
-
-try {
-    console.log(localStorage.getItem('accessToken'));
-    var {userId} = jwt_decode(localStorage.getItem('accessToken'));
-} catch (error) {
-    console.log(error);
-}
-
-
+const getUserId = () =>{
+    try {
+        const {userId} = jwt_decode(localStorage.getItem('accessToken'));
+        return userId;
+    } catch (error) {
+        console.log(error);
+    }
+};
 export default class AccountList extends Component{
     constructor(props){
         super(props);
@@ -40,10 +39,11 @@ export default class AccountList extends Component{
             ],
 
             selectedName: 'Payment account',
-        }
+        };
     }
 
     componentDidMount(){
+        console.log('UserId: ' + getUserId());
         const accessToken = localStorage.getItem('accessToken');
         const refreshToken = localStorage.getItem('refreshToken');
 
@@ -61,7 +61,7 @@ export default class AccountList extends Component{
                     }
                 };
 
-                axios.get('http://localhost:8080/account/payment/' + userId, config).then(response => {
+                axios.get('http://localhost:8080/account/payment/' + getUserId(), config).then(response => {
                     console.log(response);
                     const responseList = [...response.data];
                     this.setState({accountList: responseList});
@@ -85,7 +85,7 @@ export default class AccountList extends Component{
         };
 
         if(eventKey == 1){
-            axios.get('http://localhost:8080/account/payment/' + userId, config).then(response => {
+            axios.get('http://localhost:8080/account/payment/' + getUserId(), config).then(response => {
                 console.log(response);
                 const responseList = [...response.data];
                 this.setState({accountList: responseList});
@@ -95,7 +95,7 @@ export default class AccountList extends Component{
         }
 
         if(eventKey == 2){
-            axios.get('http://localhost:8080/account/saving/' + userId, config).then(response => {
+            axios.get('http://localhost:8080/account/saving/' + getUserId(), config).then(response => {
                 console.log(response);
                 const responseList = [...response.data];
                 this.setState({accountList: responseList});
