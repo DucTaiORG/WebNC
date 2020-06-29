@@ -22,7 +22,7 @@ router.post('/:id/delete', async(req, res) => {
     return res.json(result);
 });
 
-router.post('/:id/update', async(req, res) => {
+router.post('/update', async(req, res) => {
     const result = await userModel.updateContact(req.body.accountNumber, req.body.rememberName, req.body.id);
     return res.json(result);
 })

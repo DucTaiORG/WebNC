@@ -84,9 +84,9 @@ export default class ReceiverList extends Component {
             </div>
           </form>
 
-          <div className="customer-inner">
+          <div className="admin-content">
           
-            <Table striped bordered hover>
+            <Table className="table table-striped table-dark" style={{marginTop: 20}}>
               <thead>
                 <tr>
                   <th>#</th>

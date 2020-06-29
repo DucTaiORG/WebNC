@@ -114,7 +114,7 @@ const self = module.exports = {
     },
 
     showUserContact: userId => {
-        return db.load(`SELECT receiveaccount.accountNumber, receiveaccount.rememberName FROM receiveaccount JOIN users_add_users ON receiveaccount.id = users_add_users.receiveUserID WHERE users_add_users.userID = ${userId}`);
+        return db.load(`SELECT receiveaccount.accountNumber, receiveaccount.rememberName, users_add_users.receiveUserID FROM receiveaccount JOIN users_add_users ON receiveaccount.id = users_add_users.receiveUserID WHERE users_add_users.userID = ${userId}`);
     },
 
     updateContact: (accountNumber, rememberName, id) => {
