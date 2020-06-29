@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import AccountRow from './AccountRow';
 import axios from 'axios';
 import { Table } from 'react-bootstrap';
+import ContactRow from './ContactRow';
 
 export default class ReceiverList extends Component {
 
@@ -83,8 +84,9 @@ export default class ReceiverList extends Component {
             </div>
           </form>
 
-          <div className="customer-content">
-            <Table striped bordered hover className="customer-inner">
+          <div className="customer-inner">
+          
+            <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>#</th>
@@ -97,7 +99,7 @@ export default class ReceiverList extends Component {
                   
                   this.state.list.map((object, index) => (
                     
-                    <AccountRow position={index + 1} obj={object} key={index} />
+                    <ContactRow position={index + 1} obj={object} key={index} />
                   ))
                 }
               </tbody>
