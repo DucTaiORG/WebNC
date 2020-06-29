@@ -6,22 +6,24 @@ class HistoryRow extends Component{
     render(){
         return(
             <tr>
-                <td>{this.props.obj.position}</td>
+                <td>{this.props.position}</td>
                 <td>{this.props.obj.money_amount}</td>
-                <td>{this.props.obj.account_num || this.props.obj.from_account}</td>
-                <td>{this.props.obj.to_account}</td>
+                <td>{this.props.obj.from_account || this.props.obj.lender}</td>
+                <td>{this.props.obj.account_num || this.props.obj.to_account || this.props.obj.debtor}</td>
                 <td>{this.props.obj.time}</td>
             </tr>
         )
     }
 }
 
-try {
-    console.log(localStorage.getItem('accessToken'));
-    var {userId} = jwt_decode(localStorage.getItem('accessToken'));
-} catch (error) {
-    console.log(error);
-}
+const getUserId = () =>{
+    try {
+        const {userId} = jwt_decode(localStorage.getItem('accessToken'));
+        return userId;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 export default class CustomerHistory extends Component{
     constructor(props){
@@ -53,7 +55,7 @@ export default class CustomerHistory extends Component{
                 };
         
                 const postBody = {
-                    userId
+                    userId: getUserId()
                 };
         
                 axios.post('http://localhost:8080/user/depositHistory', postBody, config).then((response)=>{
@@ -81,7 +83,7 @@ export default class CustomerHistory extends Component{
         };
 
         const postBody = {
-            userId
+            userId: getUserId()
         };
 
         axios.post('http://localhost:8080/user/' + evenyKey, postBody, config).then((response)=>{
@@ -101,16 +103,16 @@ export default class CustomerHistory extends Component{
                     <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="warning" title={this.state.viewType}>
                         <Dropdown.Item eventKey="depositHistory" onSelect={this.handleTypeChange}>Deposit History</Dropdown.Item>
                         <Dropdown.Item eventKey="transferHistory" onSelect={this.handleTypeChange}>Transfer History</Dropdown.Item>
-                        <Dropdown.Item eventKey="Something else" onSelect={this.handleTypeChange}>Something else</Dropdown.Item>
+                        <Dropdown.Item eventKey="paydebtHistory" onSelect={this.handleTypeChange}>Pay Debt History</Dropdown.Item>
                     </DropdownButton>
                     <Table striped bordered hover>
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Money Amount</th>
-                                <th>From account</th>
-                                <th>To account</th>
-                                <th>Time</th>
+                                <th>{this.state.historyType == 'paydebtHistory'? 'Lender' : 'From account'}</th>
+                                <th>{this.state.historyType == 'paydebtHistory'? 'Debtor' : 'To account'}</th>
+                                <th>{this.state.historyType == 'paydebtHistory'? 'Pay time' : 'Time'}</th>
                             </tr>
                         </thead>
                         <tbody>

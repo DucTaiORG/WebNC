@@ -6,12 +6,15 @@ import {Table, Dropdown, DropdownButton} from 'react-bootstrap';
 import Receiver from './Receiver';
 import jwt_decode from 'jwt-decode';
 
-try {
-    console.log(localStorage.getItem('accessToken'));
-    var {userId} = jwt_decode(localStorage.getItem('accessToken'));
-} catch (error) {
-    console.log(error);
-}
+const getUserId = () =>{
+    try {
+        console.log(localStorage.getItem('accessToken'));
+        const {userId} = jwt_decode(localStorage.getItem('accessToken'));
+        return userId;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 const formValid = formErrors =>{
     let valid  = true;
@@ -78,7 +81,7 @@ export default class CreateDebt extends Component {
                     }
                 };
 
-                axios.get('http://localhost:8080/user/byUserId/' + userId, config).then(response => {
+                axios.get('http://localhost:8080/user/byUserId/' + getUserId(), config).then(response => {
                     console.log(response);
                     const responseData = {...response.data};
                     this.setState({loggedAccount: responseData});

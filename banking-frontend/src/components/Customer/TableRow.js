@@ -6,7 +6,7 @@ export default class TableRow extends Component {
     super(props);
   }
   delete = () => {
-    this.props.handelDel(this.props.obj.id);
+    this.props.handleDel(this.props.obj.id);
   }
 
   pay = () => {
@@ -33,7 +33,7 @@ export default class TableRow extends Component {
             {this.props.obj.time}
           </td>
           <td>
-            {this.props.obj.status}
+            {this.props.obj.status == 0 ? 'Not paid yet' : 'Paid'}
           </td>
           <td>
             {this.props.obj.status == 0 ? <button className="btn btn-primary" onClick={this.pay}>Pay debt</button> : null}

@@ -145,7 +145,8 @@ const self = module.exports = {
             debtor: debtorAcc,
             money_amount: money,
             content,
-            time: moment().format('YYYY-MM-DD HH:mm:ss')
+            time: moment().format('YYYY-MM-DD HH:mm:ss'),
+            isActive: true
         }
 
         return db.add(entity, 'debt');
@@ -155,7 +156,7 @@ const self = module.exports = {
         return db.load(`SELECT debt.id, debt.lender, debt.debtor, debt.money_amount, debt.content, debt.time, debt.status from users 
                             JOIN paymentaccount ON users.id = paymentaccount.userId 
                             JOIN debt ON debt.lender = paymentaccount.accountNumber OR debt.debtor = paymentaccount.accountNumber
-                                WHERE users.id = ${userId}
+                                WHERE users.id = ${userId} and debt.isActive = true
                                 GROUP BY debt.time
                                 ORDER BY debt.time DESC`);
     },
@@ -172,8 +173,6 @@ const self = module.exports = {
 
         const {lender, debtor} = ret[0];
         const user = await self.singleByAccountNumber(debtor);
-        console.log(user);
-        
         if(user[0].userId != userId){
             console.log("not debtor");
             return 1;
@@ -242,18 +241,43 @@ const self = module.exports = {
         }
 
         const historyUpdate = await db.update('pay_debt_history', {"otp_number": 0, "isSuccess": true}, {"otp_number": otp});
+        console.log(historyUpdate);
+        if(historyUpdate.affectedRows === 0){
+            return 3;
+        }
         const debtUpdate = await db.update('debt', {"status": 1}, {"id": debtId});
 
         if(debtUpdate.affectedRows === 0){
-            return 2;
-        }
-
-        if(historyUpdate.affectedRows === 0){
-            return 2;
+            return 3;
         }
         
         await db.update('paymentaccount', {"balance": fromAccUpdateMoney}, {"accountNumber": debtor});
         const toAccUpdateMoney = money_amount + toAccBalance;
         return db.update('paymentaccount', {"balance": toAccUpdateMoney}, {"accountNumber": lender});
+    },
+
+    delDebt: async (id) => {
+        const condition = {
+            id,
+        }
+
+        const column = {
+            isActive: false
+        }
+        const ret = await db.update('debt', column, condition);
+        if(ret.affectedRows){
+            return true;
+        }
+        return false;
+    },
+
+    getPayDebtHistory: userId =>{
+        return db.load(`SELECT debt.lender, debt.debtor, debt.money_amount, pay_debt_history.time from users 
+                            JOIN paymentaccount ON users.id = paymentaccount.userId 
+                            JOIN debt ON debt.lender = paymentaccount.accountNumber OR debt.debtor = paymentaccount.accountNumber
+                            JOIN pay_debt_history on debt.id = pay_debt_history.debtId
+                                WHERE users.id = ${userId} AND pay_debt_history.isSuccess = true
+                                    GROUP BY pay_debt_history.time
+                                    ORDER BY pay_debt_history.time DESC`);
     }
 }

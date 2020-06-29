@@ -7,12 +7,14 @@ import jwt_decode from 'jwt-decode';
 import TransferModal from './TransferModal';
 import './Customer.css';
 
-try {
-    console.log(localStorage.getItem('accessToken'));
-    var {userId} = jwt_decode(localStorage.getItem('accessToken'));
-} catch (error) {
-    console.log(error);
-}
+const getUserId = () =>{
+    try {
+        const {userId} = jwt_decode(localStorage.getItem('accessToken'));
+        return userId;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 const formValid = formErrors =>{
     let valid  = true;
@@ -75,7 +77,7 @@ export default class DepositMoney extends Component{
                     }
                 };
 
-                axios.get('http://localhost:8080/user/byUserId/' + userId, config).then(response => {
+                axios.get('http://localhost:8080/user/byUserId/' + getUserId(), config).then(response => {
                     console.log(response);
                     const responseData = {...response.data};
                     this.setState({loggedAccount: responseData});
@@ -251,7 +253,7 @@ export default class DepositMoney extends Component{
             if(response.data.success){
                 axios.post('http://localhost:8080/transfer', submitTransfer, config).then(response => {
                     if(response.data.success){
-                        axios.get('http://localhost:8080/user/byUserId/' + userId, config).then(response => {
+                        axios.get('http://localhost:8080/user/byUserId/' + getUserId(), config).then(response => {
                             console.log(response);
                             const responseData = {...response.data};
                             this.setState({loggedAccount: responseData});

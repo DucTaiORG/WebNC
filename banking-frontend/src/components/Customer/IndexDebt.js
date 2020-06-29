@@ -4,12 +4,14 @@ import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import TransferModal from './TransferModal';
 
-try {
-    console.log(localStorage.getItem('accessToken'));
-    var {userId} = jwt_decode(localStorage.getItem('accessToken'));
-} catch (error) {
-    console.log(error);
-}
+const getUserId = () =>{
+    try {
+        const {userId} = jwt_decode(localStorage.getItem('accessToken'));
+        return userId;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 export default class Index extends Component {
     constructor(props) {
@@ -48,12 +50,12 @@ export default class Index extends Component {
                         'x-access-token': localStorage.getItem('accessToken')
                     }
                 };
-                axios.get('http://localhost:8080/user/getDebt/' + userId, config).then(response => {
+                axios.get('http://localhost:8080/user/getDebt/' + getUserId(), config).then(response => {
                     console.log(response.data);
                     this.setState({debts: response.data});
                 }).catch(function (error) {
                     console.log(error.response);
-                })
+                });
             }
         }).catch((error) => {
             console.log(error);
@@ -61,27 +63,28 @@ export default class Index extends Component {
     }
 
     handleDelete = id => {
-        const accessToken = localStorage.getItem('accessToken');
-        const refreshToken = localStorage.getItem('refreshToken');
-    
-        const postBody = {
-            accessToken,
-            refreshToken
-        }
-    
-        axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
-            if(response.data.accessToken){
-                localStorage.setItem('accessToken', response.data.accessToken);
-                const config = {
-                    headers: {
-                        'x-access-token' : localStorage.getItem('accessToken')
-                    }
-                }
-    
+        const config = {
+            headers: {
+                'x-access-token': localStorage.getItem('accessToken')
             }
-        }).catch((error) => {
+        };
+    
+        axios.get('http://localhost:8080/user/delDebt/' + id, config).then(response => {
+            console.log(response.data);
+            if(response.data.success){
+                axios.get('http://localhost:8080/user/getDebt/' + getUserId(), config).then(response => {
+                    console.log(response.data);
+                    this.setState({debts: response.data});
+                }).catch(function (error) {
+                    console.log(error.response);
+                });
+                alert('Delete debt success');  
+            }else{
+                alert('Delete debt fail');
+            }
+        }).catch(function (error) {
             console.log(error.response);
-        })
+        });
     }
 
     handlePay = id =>{
@@ -93,7 +96,6 @@ export default class Index extends Component {
             accessToken,
             refreshToken
         }
-    
         axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
             if(response.data.accessToken){
                 localStorage.setItem('accessToken', response.data.accessToken);
@@ -106,15 +108,15 @@ export default class Index extends Component {
 
                 const body = {
                     id,
-                    userId,
+                    userId: getUserId(),
                 }
     
                 axios.post('http://localhost:8080/user/addPaydebtHistory', body, config).then((response) =>{
                     console.log(response.data);
                     this.setState({showModal: true});
                 }).catch(function (error){
-                    console.log(error);
-                    alert(error)
+                    console.log(error.response);
+                    alert(error.response.data);
                 })
             }
         }).catch((error) => {
@@ -127,7 +129,6 @@ export default class Index extends Component {
     }
 
     handleSubmitModal = (otp)=>{
-        console.log('otp: '+ otp);
         const state = this.state;
         const submitVerify = {
             otpNum: otp
@@ -135,7 +136,7 @@ export default class Index extends Component {
 
         const submitTransfer = {
             debtId: state.currentId,
-            userId,
+            userId: getUserId(),
             otp,
         }
 
@@ -150,16 +151,19 @@ export default class Index extends Component {
             if(response.data.success){
                 axios.post('http://localhost:8080/user/payDebt', submitTransfer, config).then(response => {
                     if(response.data.success){
-                        axios.get('http://localhost:8080/user/getDebt/' + userId, config).then(response => {
+                        axios.get('http://localhost:8080/user/getDebt/' + getUserId(), config).then(response => {
                             console.log(response.data);
                             this.setState({debts: response.data});
                         }).catch(function (error) {
                             console.log(error.response);
                         });
                         alert('Pay debt successful');
+                    }else{
+                        alert(response.data.message);
                     }
                 }).catch(error => {
                     console.log(error.response);
+                    alert(error.response.data.message);
                 });
             }else{
                 alert('Verify fail!');
@@ -192,7 +196,7 @@ export default class Index extends Component {
                     <tbody>
                     {
                         this.state.debts.map((object, index)=>{
-                            return <TableRow obj={object} key={index} handelDel={this.handleDelete} handlePay={this.handlePay}/>
+                            return <TableRow obj={object} key={index} handleDel={this.handleDelete} handlePay={this.handlePay}/>
                         })
                     }
                     </tbody>

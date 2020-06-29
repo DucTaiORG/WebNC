@@ -72,12 +72,6 @@ router.get('/getDebt/:id', async (req, res)=>{
     }
 
     ret.forEach(item => {
-        if(item.status == 1){
-            item.status = 'Paid';
-        }
-        if(item.status == 0){
-            item.status = 'Not yet paid';
-        }
         item.time = moment(item.time).format('HH:mm:ss DD/MM/YYYY');
     });
     return res.json(ret);
@@ -98,7 +92,7 @@ router.post('/addPaydebtHistory', async (req, res)=>{
     }
 
     if(ret == 1){
-        return res.status(401).json("Client error");
+        return res.status(401).json("Not debtor");
     }
 
     const time = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -136,10 +130,35 @@ router.post('/payDebt', async (req, res)=>{
     const ret = await userModel.payDebt(debtId, userId, otp);
 
     if(ret == null){
-        return res.json({success: false});
-    }else{
+        return res.status(400).json({success: false, message: 'Client error'});
+    }
+    if(ret == 2){
+        return res.status(400).json({success: false, message: 'Not enough money'});
+    }
+    if(ret == 3){
+        return res.status(500).json({success: false, message: 'Server error'});
+    }
+    return res.json({success: true});
+});
+
+router.get('/delDebt/:id', async (req, res)=>{
+    console.log(req.params);
+    const ret = await userModel.delDebt(req.params.id);
+    if(ret){
         return res.json({success: true});
     }
-})
+    return res.json({success: false}); 
+});
+
+router.post('/paydebtHistory', async (req, res)=>{
+    console.log(req.params);
+    const ret = await userModel.getPayDebtHistory(req.body.userId);
+    ret.forEach(element => {
+        element.time = moment(element.time).format('HH:mm:ss DD/MM/YYYY'); 
+    });
+    console.log(ret);
+    
+    return res.json(ret);
+});
 
 module.exports = router;
