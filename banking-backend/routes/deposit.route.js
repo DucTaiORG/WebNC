@@ -37,6 +37,7 @@ router.post('/history', async (req, res)=>{
         element.time = moment(element.time).format('HH:mm:ss DD/MM/YYYY'); 
     });
     
+    console.log(ret);
     return res.json(ret);
 });
 

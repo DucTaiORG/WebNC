@@ -99,7 +99,7 @@ export default class ViewHistory extends Component{
                     <tbody>
                         {
                             this.state.historyArray.map((row,index) => (
-                                <HistoryRow position={index + 1} amount={row.money_amount} time={row.deposit_time} key={index}/>
+                                <HistoryRow position={index + 1} amount={row.money_amount} time={row.time} key={index}/>
                             ))
                         }
                     </tbody>
