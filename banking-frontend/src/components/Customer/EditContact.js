@@ -29,6 +29,7 @@ export default class EditContact extends Component {
                     }
                 };
                 axios.get('http://localhost:8080/contact/' + this.props.match.params.id, config).then(response => {
+                    console.log(this.props.match.params.id);
                     console.log(response);
                     this.setState(response.data);
                     console.log(this.state);

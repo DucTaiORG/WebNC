@@ -4,11 +4,11 @@ import {Link} from 'react-router-dom';
 export default class ContactRow extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            showPopup: false
-        }
     }
 
+    delete = () => {
+        this.props.handleDel(this.props.obj.receiveUserID);
+    }
 
     render() {
         return (
@@ -23,7 +23,7 @@ export default class ContactRow extends Component {
                     {this.props.obj.rememberName}
                 </td>
                 <td>
-                    <Link to={'/customer/contact/management/edit/' + this.props.obj.receiveUserID} className="btn btn-primary">Edit</Link>
+                    <Link to={'/contact/management/edit/' + this.props.obj.receiveUserID} className="btn btn-primary">Edit</Link>
                 </td>
                 <td>
                     <button className="btn btn-danger" onClick={this.delete}>Delete</button>
