@@ -11,6 +11,7 @@ import Employee from './components/Employee/Employee';
 import Customer from './components/Customer/Customer';
 import {ProtectedRoute} from './components/RouterURL/ProtectedRoute';
 import { loadReCaptcha } from 'react-recaptcha-google'
+import EditContact from './components/Customer/EditContact'
 
 
 class App extends Component {
@@ -49,7 +50,11 @@ class App extends Component {
         <Navigation/>
         <Switch>
           <Route exact path="/" component={Login}/>
-          
+
+          <Route path="/customer/edit/:id" component={EditContact} />
+
+          {/* <Route path="/customer/receiverList" component={EditContact} /> */}
+
           <ProtectedRoute 
             path="/customer"
             component={Customer}/>
@@ -63,6 +68,7 @@ class App extends Component {
             component={Admin}/>
 
           <Route path="*" component={()=>"404 NOT FOUND"}/>
+          
         </Switch>
         <div className="footer-container">
           <Footer/>

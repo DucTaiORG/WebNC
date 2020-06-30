@@ -6,12 +6,12 @@ export default class EditContact extends Component {
         super(props);
         this.state = {
             accountNumber: '',
-            rememberName: '',
-            id: ''
+            rememberName: ''
         }
     }
 
     componentDidMount(){
+        console.log(this.state);
         const accessToken = localStorage.getItem('accessToken');
         const refreshToken = localStorage.getItem('refreshToken');
 
@@ -28,11 +28,9 @@ export default class EditContact extends Component {
                         'x-access-token': localStorage.getItem('accessToken')
                     }
                 };
-                axios.get('http://localhost:8080/contact/' + this.props.match.params.id, config).then(response => {
-                    console.log(this.props.match.params.id);
-                    console.log(response);
-                    this.setState(response.data);
-                    console.log(this.state);
+                axios.get('http://localhost:8080/contact/detail/' + this.props.match.params.id, config).then(response => {
+                    console.log(response.data);
+                    this.setState(response.data[0]);
                 }).catch(function (error) {
                     console.log(error);
                 })
@@ -60,6 +58,8 @@ export default class EditContact extends Component {
             refreshToken
         }
 
+        console.log(this.props.match.params.id);
+
         axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
             if(response.data.accessToken){
                 localStorage.setItem('accessToken', response.data.accessToken);
@@ -69,11 +69,12 @@ export default class EditContact extends Component {
                     }
                 }
 
-                axios.post('http://localhost:8080/contact/update', submitForm, config).then((response) =>{
+                axios.post(`http://localhost:8080/contact/update/${this.props.match.params.id}`, submitForm, config).then((response) =>{
                     console.log(response.data);
                     if(response.data.affectedRows){
                         alert('Edit success');
-                        this.props.history.push('/contact/management/index');
+                        this.props.history.push('/customer/receiverList');
+                        console.log(this.props.history);
                     }else{
                         alert('Can not edit');
                     }
@@ -87,8 +88,7 @@ export default class EditContact extends Component {
         })
         this.setState({
             accountNumber: '',
-            rememberName: '',
-            id: ''
+            rememberName: ''
         });
     }
 
@@ -100,11 +100,11 @@ export default class EditContact extends Component {
 
                     <div className="form-group">
                         <label>Username</label>
-                        <input type="text" name="username" value={this.state.accountNumber} className="form-control" placeholder="Enter user name" onChange={this.handleInputChange}/>
+                        <input type="text" name="accountNumber" value={this.state.accountNumber} className="form-control" placeholder="Enter user name" onChange={this.handleInputChange}/>
                     </div>
                     <div className="form-group">
-                        <label>Employee name</label>
-                        <input type="text" name="fullname" value={this.state.rememberName} className="form-control" placeholder="Enter customer name" onChange={this.handleInputChange}/>
+                        <label>Account Number</label>
+                        <input type="text" name="rememberName" value={this.state.rememberName} className="form-control" placeholder="Enter customer name" onChange={this.handleInputChange}/>
                     </div>
                     
                     <button className="submit-button" type="submit" className="btn btn-primary btn-block">Submit</button>

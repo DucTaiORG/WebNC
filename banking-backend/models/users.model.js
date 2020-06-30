@@ -122,7 +122,7 @@ const self = module.exports = {
     },
 
     showDetailContact: receiveUserID => {
-        return db.load(`SELECT * FROM receiveaccount WHERE id = ${receiveUserID}`);
+        return db.load(`SELECT * FROM receiveaccount WHERE id = '${receiveUserID}'`);
     },
 
     deleteUsersAddUsers: (userId, receiveUserID) => {

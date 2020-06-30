@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Table } from 'react-bootstrap';
 import ContactRow from './ContactRow';
 import EditContact from './EditContact';
-import { Link, Route, Switch, BrowserRouter as Router } from 'react-router-dom'
+import { withRouter, Link, Route, Switch, BrowserRouter as Router } from 'react-router-dom'
 
 export default class ReceiverList extends Component {
 
@@ -128,53 +128,59 @@ export default class ReceiverList extends Component {
 
   render() {
     return (
-      <div className="customer-content">
-
-        <h3>Add Contact</h3>
+      // <Router>
         <div className="customer-content">
-          <form onSubmit={this.handleAddContact} className="customer-inner">
-            <div className="form-group">
-              <label>Remember Name:  </label>
-              <input name="rememberName" type="text" className="form-control" onChange={this.handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Account Number: </label>
-              <input name="accountNumber" type="text" className="form-control" onChange={this.handleInputChange} />
-            </div>
-            <div className="form-group">
-              <input type="submit" value="Add" className="btn btn-primary" />
-            </div>
-          </form>
 
-          <div className="admin-content">
-            <div className="customer-inner">
-              <Table className="table table-striped" style={{ marginTop: 20 }}>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Remember Name</th>
-                    <th>Account Number</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
+          <h3>Add Contact</h3>
+          <div className="customer-content">
+            <form onSubmit={this.handleAddContact} className="customer-inner">
+              <div className="form-group">
+                <label>Remember Name:  </label>
+                <input name="rememberName" type="text" className="form-control" onChange={this.handleInputChange} />
+              </div>
+              <div className="form-group">
+                <label>Account Number: </label>
+                <input name="accountNumber" type="text" className="form-control" onChange={this.handleInputChange} />
+              </div>
+              <div className="form-group">
+                <input type="submit" value="Add" className="btn btn-primary" />
+              </div>
+            </form>
 
-                    this.state.list.map((object, index) => (
+            <div className="admin-content">
+              <div className="customer-inner">
+                <Table className="table table-striped" style={{ marginTop: 20 }}>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Remember Name</th>
+                      <th>Account Number</th>
+                      <th>Edit</th>
+                      <th>Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
 
-                      <ContactRow position={index + 1} obj={object} key={index} handleDel={this.handleDelete} />
-                    ))
-                  }
-                </tbody>
-              </Table>
+                      this.state.list.map((object, index) => (
+
+                        <ContactRow position={index + 1} obj={object} key={index} handleDel={this.handleDelete} />
+                      ))
+                    }
+                  </tbody>
+                </Table>
+              </div>
+
             </div>
 
           </div>
 
-        </div>
-      </div>
+          {/* <Switch>
+            <Route exact path={`/customer/edit/:id`} component={withRouter(EditContact)} />
+          </Switch> */}
 
+        </div>
+      /* </Router> */
 
     )
   }
