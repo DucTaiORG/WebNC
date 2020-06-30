@@ -3,6 +3,8 @@ import AccountRow from './AccountRow';
 import axios from 'axios';
 import { Table } from 'react-bootstrap';
 import ContactRow from './ContactRow';
+import EditContact from './EditContact';
+import { Link, Route, Switch, BrowserRouter as Router } from 'react-router-dom'
 
 export default class ReceiverList extends Component {
 
@@ -51,15 +53,29 @@ export default class ReceiverList extends Component {
       rememberName,
       accountNumber
     }
-    axios.post(`http://localhost:8080/contact/${userId}/add`, entity).then((response) => {
-      console.log(response.data);
-      alert("Added Successfully");
-      axios.get(`http://localhost:8080/contact/${userId}`).then((response) => {
-        const contactList = [...response.data];
-        this.setState({ list: contactList });
-      }).catch(error => {
-        console.log(error);
-      });
+
+    axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
+      if (response.data.accessToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        const config = {
+          headers: {
+            'x-access-token': localStorage.getItem('accessToken')
+          }
+        }
+        axios.post(`http://localhost:8080/contact/${userId}/add`, entity).then((response) => {
+          console.log(response.data);
+          alert("Added Successfully");
+          axios.get(`http://localhost:8080/contact/${userId}`).then((response) => {
+            const contactList = [...response.data];
+            this.setState({ list: contactList });
+          }).catch(error => {
+            console.log(error);
+          });
+        })
+
+      }
+    }).catch((error) => {
+      console.log(error.response);
     })
   }
 
@@ -158,6 +174,8 @@ export default class ReceiverList extends Component {
 
         </div>
       </div>
+
+
     )
   }
 }
