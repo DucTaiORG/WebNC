@@ -121,6 +121,10 @@ const self = module.exports = {
         return db.load(`UPDATE receiveaccount SET accountNumber = '${accountNumber}', rememberName = '${rememberName}' WHERE receiveaccount.id = ${id}`);
     },
 
+    showDetailContact: receiveUserID => {
+        return db.load(`SELECT * FROM receiveaccount WHERE id = ${receiveUserID}`);
+    },
+
     deleteUsersAddUsers: (userId, receiveUserID) => {
         return db.load(`DELETE FROM users_add_users WHERE users_add_users.userID = '${userId}' AND users_add_users.receiveUserID = '${receiveUserID}'`);
     },

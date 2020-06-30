@@ -25,6 +25,11 @@ router.post('/:id/delete', async(req, res) => {
 router.post('/update/:id', async(req, res) => {
     const result = await userModel.updateContact(req.body.accountNumber, req.body.rememberName, req.params.id);
     return res.json(result);
-})
+});
+
+router.get('/detail/:id', async (req, res) => {
+    const result = await userModel.showDetailContact(req.params.id);
+    res.json(result);
+});
 
 module.exports = router;
