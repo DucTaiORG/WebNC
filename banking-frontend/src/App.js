@@ -11,7 +11,8 @@ import Employee from './components/Employee/Employee';
 import Customer from './components/Customer/Customer';
 import {ProtectedRoute} from './components/RouterURL/ProtectedRoute';
 import { loadReCaptcha } from 'react-recaptcha-google'
-import EditContact from './components/Customer/EditContact'
+import EditContact from './components/Customer/EditContact';
+import Forgot from './components/ForgotPassword/Forgot';
 
 
 class App extends Component {
@@ -50,7 +51,7 @@ class App extends Component {
         <Navigation/>
         <Switch>
           <Route exact path="/" component={Login}/>
-
+          <Route exact path="/forgot" component={Forgot}/>
           <Route path="/customer/edit/:id" component={EditContact} />
 
           {/* <Route path="/customer/receiverList" component={EditContact} /> */}

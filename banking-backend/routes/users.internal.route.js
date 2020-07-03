@@ -96,13 +96,13 @@ router.post('/addPaydebtHistory', async (req, res)=>{
     }
 
     const time = moment().format('YYYY-MM-DD HH:mm:ss');
-    const html = `Dear ${debtor},
+    const html = `Dear <b>${debtor}</b>,
     <br/>
     This email is sent from DTBank!
     <br/><br/>
-    You have transfered ${money_amount} from ${debtor} account number to ${lender} account number at ${time}
+    You have transfered <b>${money_amount}</b> from <b>${debtor}</b> account number to <b>${lender}</b> account number at ${time}
     <br/>
-    This is your OTP: ${ret}
+    This is your OTP: <b>${ret}</b>
     <br/>
     The OTP will expire in three hours
     <br/>
@@ -160,5 +160,59 @@ router.post('/paydebtHistory', async (req, res)=>{
     
     return res.json(ret);
 });
+
+router.get('/forgot/sendEmail/:username', async (req, res)=>{
+    console.log(req.params);
+    const {username} = req.params.username;
+    const users = await userModel.singleByUserName(username);
+    
+    if(users.length == 0){
+        return res.status(204).end();
+    }
+    const email = users[0].email;
+    
+    const otp = await userModel.addForgotHistory(username);
+
+    if(otp == null){
+        return res.status(500).json({error: "Server error"});
+    }
+
+    const html = `Dear <b>${username}</b>,
+    <br/>
+    This email is sent from DTBank!
+    <br/><br/>
+    Did you forgot your password?
+    <br/>
+    This is your OTP: <b>${otp}</b>
+    <br/>
+    The OTP will expire in three hours
+    <br/>
+    Thanks for using our service!`;
+
+    await mailer.sendEmail('ronin32014@gmail.com', email, 'Please verify transfer OTP!', html);
+    return res.json({success: true});
+});
+
+router.post('/forgor/verify', async (req, res)=>{
+    console.log(req.body);
+    const {otpNum} = req.body;
+    const ret = await userModel.verifyForgotOTP(otpNum);
+    
+    if(ret == null){
+        return res.json({success: false});
+    }else{
+        return res.json({success: true});
+    }
+});
+
+router.post('/resetPassword', async (req, res)=>{
+    console.log(req.body);
+    const {username, password} = req.body;
+    const ret = await userModel.resetPassword(username, password);
+    if(ret.affectedRows){
+        return res.json({success: true});
+    }
+    return res.json({success: false});
+})
 
 module.exports = router;

@@ -60,6 +60,8 @@ app.post('/user/register', verifyEmployee, async (req, res)=>{
     }
 });
 
+app.use('/forgot', require('./routes/forgot.route'));
+
 app.use((req, res, next) => {
     res.status(404).send('RESOURCE NOT FOUND!');
 });

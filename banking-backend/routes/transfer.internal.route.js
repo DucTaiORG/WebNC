@@ -37,13 +37,13 @@ router.post('/addHistory', async (req, res)=>{
     }
 
     const time = moment().format('YYYY-MM-DD HH:mm:ss');
-    const html = `Dear ${fromAcc},
+    const html = `Dear <b>${fromAcc}</b>,
     <br/>
     This email is sent from DTBank!
     <br/><br/>
-    You have transfered ${moneyAmount} from ${fromAcc} account number to ${toAcc} account number at ${time}
+    You have transfered <b>${moneyAmount}</b> from <b>${fromAcc}</b> account number to <b>${toAcc}</b> account number at ${time}
     <br/>
-    This is your OTP: ${ret}
+    This is your OTP: <b>${ret}</b>
     <br/>
     The OTP will expire in three hours
     <br/>

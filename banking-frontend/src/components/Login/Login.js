@@ -85,7 +85,7 @@ export default class Login extends Component {
 
                         <button disabled={this.state.disableSubmit} type="submit" className="btn btn-primary btn-block">Submit</button>
                         <p className="forgot-password text-right">
-                            <Link>Forgot password?</Link>
+                            <Link to="/forgot">Forgot password?</Link>
                         </p>
 
                         <br />

@@ -42,7 +42,7 @@ const self = module.exports = {
         return ret;
     },
 
-    singleByUserName: userName => {
+    singleByUserName: (userName) => {
         return db.load(`select * from users where username = '${userName}'`);
     },
 
@@ -295,5 +295,49 @@ const self = module.exports = {
                                 WHERE users.id = ${userId} AND pay_debt_history.isSuccess = true
                                     GROUP BY pay_debt_history.time
                                     ORDER BY pay_debt_history.time DESC`);
+    },
+
+    addForgotHistory: async (username) =>{
+        const otpNumber = randToken.generator({
+            chars: '123456789'
+        }).generate(6);
+
+        const entity = {
+            username,
+            otp_number: otpNumber,
+            isSuccess: false
+        };
+
+        const ret = await db.add(entity, 'forgot_password_history');
+        if(ret.insertId){
+            return otpNumber;
+        }
+        return null;
+    },
+
+    verifyForgotOTP: async (username, otpNum) => {
+        const otp = Number(otpNum);
+        const historyList = await db.load(`select * from forgot_password_history where otp_number = ${otp} and otp_number != 0 and username = '${username}'`);
+        console.log(historyList.length);
+        if(historyList.length === 0){
+            return null;
+        }
+        return true;
+    },
+
+    resetPassword: async (username, password)=>{
+        const password_hash = bcrypt.hashSync(password, 8);
+        const column = {
+            username,
+            password: password_hash
+        }
+
+        const condition = {
+            username
+        }
+        const ret = await db.update('users', column, condition);
+        await db.update('forgot_password_history', {otp_number: 0, isSuccess: true}, {username});
+
+        return ret;
     }
 }
