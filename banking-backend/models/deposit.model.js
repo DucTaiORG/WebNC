@@ -20,7 +20,7 @@ module.exports = {
     },
 
     getDepositHistory: async accNum =>{
-        const rows = await db.load(`select * from deposit_history where account_num = '${accNum}' order by deposit_time DESC`);
+        const rows = await db.load(`select * from deposit_history where account_num = '${accNum}' order by time DESC`);
         if(rows.length === 0){
             return null;
         }

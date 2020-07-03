@@ -1,8 +1,16 @@
 import React, { Component } from "react";
 import axios from 'axios';
-import CustomModal from './CustomModal';
+import jwt_decode from 'jwt-decode';
+import {Alert} from 'react-bootstrap';
 
-
+const getUserId = () =>{
+    try {
+        const {userId} = jwt_decode(localStorage.getItem('accessToken'));
+        return userId;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 const formValid = formErrors =>{
     let valid  = true;
@@ -13,39 +21,79 @@ export default class Forgot extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            username: '',
+            oldPassword: '',
             password: '',
             repassword: '',
             formErrors:{
-                username: '',
                 password: '',
                 repassword: ''
             },
-            showModal: false
+            showModal: false,
+            showAlert: false,
+            alertMessage: '',
+            alertVariant: ''
         }
     }
     
     handleSubmit = (event) => {
         event.preventDefault();
-
+        const state = this.state;
+        const self = this;
         if(formValid(this.state.formErrors)){
-            axios.get('http://localhost:8080/forgot/sendEmail/' + this.state.username).then(response => {
-                console.log(response.data);
-                if(response.data.success){
-                    this.setState({showModal: true});
-                }
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
 
-                if(response.status == 204){
-                    alert('User name not found');
+            const postBody = {
+                accessToken,
+                refreshToken
+            }
+
+            axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
+                if(response.data.accessToken){
+                    localStorage.setItem('accessToken', response.data.accessToken);
+
+                    const config = {
+                        headers: {
+                            'x-access-token': localStorage.getItem('accessToken')
+                        }
+                    };
+
+                    const submitBody = {
+                        userId: getUserId(),
+                        oldPass: state.oldPassword,
+                        newPass: state.password
+                    }
+                    
+                    axios.post('http://localhost:8080/user/changePassword', submitBody, config).then(response => {
+                        console.log(response);
+                        if(response.data.success){
+                            this.setState({showAlert: true, 
+                                alertMessage: 'Change password success', 
+                                alertVariant: 'success'});
+                        }else{
+                            this.setState({showAlert: true, 
+                                alertMessage: response.data.message, 
+                                alertVariant: 'danger'});
+                        }
+                    }).catch(error=>{
+                        console.log(error.response);
+                    });
                 }
-            }).catch(function (error) {
+            }).catch((error) => {
                 console.log(error.response);
-                alert('Error occur');
             }); 
         }else{
-            alert('Invalid form');
+            this.setState({showAlert: true, 
+                alertMessage: 'Invalid form', 
+                alertVariant: 'danger'});
         }
-        
+        this.setState({oldPassword: '',
+                        password: '',
+                        repassword: '',});
+    }
+
+    closeAlert = () => {
+        this.setState({showAlert: false});
     }
 
     handleInputChange = (e) => {
@@ -53,15 +101,6 @@ export default class Forgot extends Component {
         let formErrors = this.state.formErrors;
 
         switch(name){
-            case "username":
-                if(value != undefined){
-                    if(value.length < 6){
-                        formErrors.username = "Minimum 6 characters require";
-                    }else{
-                        formErrors.username = "";
-                    }
-                }
-                break;
             case "password":
                 if(value != undefined){
                     if(value.length < 6){
@@ -85,46 +124,6 @@ export default class Forgot extends Component {
         this.setState({ [e.target.name]: e.target.value })
     }
 
-    handleSubmitModal = (otp)=>{
-        console.log('otp: '+ otp);
-        const submitVerify = {
-            username: this.state.username,
-            otpNum: otp
-        };
-
-        const submitReset = {
-            username: this.state.username,
-            password: this.state.password,
-            repassword: this.state.repassword
-        }
-
-        axios.post('http://localhost:8080/forgot/verify', submitVerify).then((response)=>{
-            console.log(response);
-            if(response.data.success){
-                axios.post('http://localhost:8080/forgot/resetPassword', submitReset).then(response => {
-                    if(response.data.success){
-                        alert('Reset password success');
-                    }
-                }).catch(error => {
-                    console.log(error.response);
-                    alert('Reset fail!');
-                });
-            }else{
-                alert('OTP not match!');
-            }
-        }).catch((error)=>{
-            console.log(error.response);
-            alert('Error occur!');
-        });
-        
-        this.setState({
-            username: "",
-            password: "",
-            repassword: '',
-            showModal: false
-        });
-    }
-
     handleCloseModal = ()=>{
         this.setState({showModal: false});
     }
@@ -134,13 +133,13 @@ export default class Forgot extends Component {
         return (
             <div className="auth-wrapper">
                 <div className="auth-inner">
+                {this.state.showAlert == true ? <Alert variant={this.state.alertVariant} show={this.state.showAlert} onClose={this.closeAlert} dismissible>{this.state.alertMessage}</Alert> : null}
                     <form onSubmit={this.handleSubmit}>
-                        <h3>Forgot password</h3>
+                        <h3>Change password</h3>
 
                         <div className="form-group">
-                            <label>User name</label>
-                            <input type="text" name="username" value={this.state.username} className="form-control" placeholder="Enter user name" onChange={this.handleInputChange} />
-                            {formErrors.username.length > 0 ? <span style={{color: 'red'}}>{formErrors.username}</span>:null}
+                            <label>Old password</label>
+                            <input type="password" name="oldPassword" value={this.state.oldPassword} className="form-control" placeholder="Enter password" onChange={this.handleInputChange} />
                         </div>
 
                         <div className="form-group">
@@ -158,7 +157,6 @@ export default class Forgot extends Component {
                         <button type="submit" className="btn btn-primary btn-block">Submit</button>
                     </form>
                 </div>
-                <CustomModal show={this.state.showModal} closemodal={this.handleCloseModal} submitmodal={this.handleSubmitModal}/>
             </div>
         );
     }

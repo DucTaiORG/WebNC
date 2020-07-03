@@ -74,14 +74,14 @@ const self = module.exports = {
     },
 
     singleByUserId: userId => {
-        return db.load(`select users.id, users.username, users.fullname, users.dateOfBirth, users.email, users.phoneNo, users.userRole from users where id = ${userId}`);
+        return db.load(`select users.id, users.username, users.password, users.fullname, users.dateOfBirth, users.email, users.phoneNo, users.userRole from users where id = ${userId}`);
     },
 
     addToDepositHistory: async (accNum, moneyAmount) => {
         const entity = {
             "account_num": accNum,
             "money_amount": moneyAmount,
-            "deposit_time": moment().format('YYYY-MM-DD HH:mm:ss')
+            "time": moment().format('YYYY-MM-DD HH:mm:ss')
         }
         const result = await db.add(entity, 'deposit_history');
         return result;        
@@ -215,6 +215,7 @@ const self = module.exports = {
     verifyPayOTP: async otpNum => {
         const otp = Number(otpNum);
         const transferList = await db.load(`select * from pay_debt_history where otp_number = ${otp} and otp_number != 0`);
+        
         if(transferList.length == 0){
             return false;
         }
@@ -339,5 +340,34 @@ const self = module.exports = {
         await db.update('forgot_password_history', {otp_number: 0, isSuccess: true}, {username});
 
         return ret;
+    },
+
+    changePassword: async (userId, oldPass, newPass)=>{
+        const users = await self.singleByUserId(userId);
+        if(users.length == 0){
+            return null;
+        }
+        
+        if(!bcrypt.compareSync(oldPass, users[0].password)){
+            return 0; // old pass not match
+        }
+        
+        const password_hash = bcrypt.hashSync(newPass);
+        
+        const column = {
+            password: password_hash
+        }
+
+        const condition = {
+            id: userId
+        }
+
+        const ret = await db.update('users', column, condition);
+        
+        if(ret.affectedRows){
+            return 1;
+        }else{
+            return 2;
+        }
     }
 }

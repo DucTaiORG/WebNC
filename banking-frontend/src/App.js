@@ -56,7 +56,7 @@ class App extends Component {
 
           {/* <Route path="/customer/receiverList" component={EditContact} /> */}
 
-          <ProtectedRoute 
+          <ProtectedRoute
             path="/customer"
             component={Customer}/>
           

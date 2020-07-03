@@ -8,7 +8,7 @@ class Auth{
         this.userId = 0
     }
 
-    login(entity, cb){
+    login(entity, cb, cb2){
         axios.post('http://localhost:8080/api/auth/login', entity).then((response) => {
             if(response.data.authenticated === true){
                 console.log(response);
@@ -29,10 +29,11 @@ class Auth{
                 }
                 cb();
             }else{
-                alert('Login fail');
+                cb2();
             }
         }).catch(function(error){
             console.log(error);
+            cb2();
         });
     }
 

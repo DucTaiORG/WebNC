@@ -3,6 +3,7 @@ import Auth from '../../auth';
 import './Login.css';
 import { ReCaptcha } from 'react-recaptcha-google'
 import { Link } from "react-router-dom";
+import {Alert} from 'react-bootstrap';
 
 export default class Login extends Component {
     constructor(props, context) {
@@ -10,7 +11,9 @@ export default class Login extends Component {
         this.state = {
             username: '',
             password: '',
-            disableSubmit: false
+            disableSubmit: false,
+            showAlert: false,
+            alertMessage: ''
         }
         this.onLoadRecaptcha = this.onLoadRecaptcha.bind(this);
         this.verifyCallback = this.verifyCallback.bind(this);
@@ -38,15 +41,21 @@ export default class Login extends Component {
 
     handleSubmitLogin = (event) => {
         event.preventDefault();
-        Auth.login(this.state,
-            () => {
-                console.log(`isLogin: ${Auth.isAuthenticated()}`);
-                this.props.history.push(`/${Auth.getUserRole()}`)
-            });
+
+        Auth.login(this.state, () => {
+            console.log(`isLogin: ${Auth.isAuthenticated()}`);
+            this.props.history.push(`/${Auth.getUserRole()}`);
+        }, ()=>{
+            this.setState({showAlert: true, alertMessage: 'Username or password not match'});
+        });
     }
 
     handleInputChange = (e) => {
         this.setState({ [e.target.name]: e.target.value })
+    }
+
+    closeAlert = () => {
+        this.setState({showAlert: false});
     }
 
     render() {
@@ -55,7 +64,8 @@ export default class Login extends Component {
                 <div className="auth-inner">
                     <form onSubmit={this.handleSubmitLogin}>
                         <h3>Sign In</h3>
-
+                        {this.state.showAlert == true ? <Alert variant="danger" show={this.state.showAlert} onClose={this.closeAlert} dismissible>{this.state.alertMessage}</Alert> : null}
+                        
                         <div className="form-group">
                             <label>User name</label>
                             <input type="text" name="username" className="form-control" placeholder="Enter user name" onChange={this.handleInputChange} />

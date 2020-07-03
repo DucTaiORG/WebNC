@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import AccountRow from './AccountRow2';
-import {Table, Dropdown, DropdownButton} from 'react-bootstrap';
+import {Table, Dropdown, DropdownButton, Alert} from 'react-bootstrap';
 import Receiver from './Receiver';
 import jwt_decode from 'jwt-decode';
 import TransferModal from './TransferModal';
@@ -54,7 +54,9 @@ export default class DepositMoney extends Component{
             },
             selectedName: 'From list',
             transferFeeType: 1,
-            showModal: false
+            showModal: false,
+            showAlert: false,
+            alertMessage: ''
         }
     }
 
@@ -156,6 +158,10 @@ export default class DepositMoney extends Component{
         }
     }
 
+    closeAlert = () => {
+        this.setState({showAlert: false});
+    }
+
     handleSubmitForm = e => {
         e.preventDefault();
         const state = this.state;
@@ -189,14 +195,14 @@ export default class DepositMoney extends Component{
                         console.log(response);
                     }).catch((error)=>{
                         console.log(error.response);
-                        alert(`Transfer fail: ${error.response.data.error}`);
+                        this.setState({showAlert: true, alertMessage: error.response.data.error});
                     });
                 }
             }).catch((error) => {
                 console.log(error.response);
             });
         }else{
-            alert("Invalid form");
+            this.setState({showAlert: true, alertMessage: 'Invalid Form'});
         }
     }
 
@@ -260,17 +266,17 @@ export default class DepositMoney extends Component{
                         }).catch(error=>{
                             console.log(error);
                         });
-                        alert('Transfer successful');
+                        this.setState({showAlert: true, alertMessage: 'Transfer successful'});
                     }
                 }).catch(error => {
                     console.log(error.response);
                 });
             }else{
-                alert('Verify fail!');
+                this.setState({showAlert: true, alertMessage: 'OTP not match', showModal: false});
             }
         }).catch((error)=>{
             console.log(error.response);
-            alert(`Transfer fail`);
+            this.setState({showAlert: true, alertMessage: 'Transfer fail', showModal: false});
         });
         
         this.setState({
@@ -286,6 +292,7 @@ export default class DepositMoney extends Component{
             <div className="customer-content">
                 <h1>Transfer Money</h1>
                 <div className="customer-inner">
+                {this.state.showAlert == true ? <Alert variant="danger" show={this.state.showAlert} onClose={this.closeAlert} dismissible>{this.state.alertMessage}</Alert> : null}
                     <Table striped bordered hover>
                         <thead>
                             <tr>

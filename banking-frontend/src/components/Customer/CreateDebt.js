@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import moment from 'moment';
 import AccountRow from './AccountRow2';
-import {Table, Dropdown, DropdownButton} from 'react-bootstrap';
+import {Table, Dropdown, DropdownButton, Alert} from 'react-bootstrap';
 import Receiver from './Receiver';
 import jwt_decode from 'jwt-decode';
 
@@ -59,6 +58,9 @@ export default class CreateDebt extends Component {
             ],
 
             selectedName: 'From list',
+            showAlert: false,
+            alertMessage: '',
+            alertVariant: ''
         };
     }
 
@@ -92,6 +94,10 @@ export default class CreateDebt extends Component {
         }).catch((error) => {
             console.log(error.response);
         });
+    }
+
+    closeAlert = () => {
+        this.setState({showAlert: false});
     }
 
     handleSubmitForm = e =>{
@@ -128,21 +134,32 @@ export default class CreateDebt extends Component {
                     axios.post('http://localhost:8080/user/addDebt', submitForm, config).then((response)=>{
                         console.log(response);
                         if(response.data.success){
-                            alert(`Add debt success`);
+                            this.setState({showAlert: true, 
+                                            alertMessage: 'Add debt successful', 
+                                            alertVariant: 'success'});
                         }else{
-                            alert(`Add debt fail: account number not found`);
+                            this.setState({showAlert: true, 
+                                            alertMessage: 'Account number not found', 
+                                            alertVariant: 'danger'});
                         }
                     }).catch((error)=>{
                         console.log(error.response);
-                        alert(`Add debt fail: ${error.response.data.error}`);
+                        this.setState({showAlert: true, 
+                                        alertMessage: `Error: ${error.response.data.error}`, 
+                                        alertVariant: 'danger'});
                     });
                 }
             }).catch((error) => {
                 console.log(error.response);
             });
         }else{
-            alert("Invalid form");
+            this.setState({showAlert: true, 
+                            alertMessage: `Invalid form`, 
+                            alertVariant: 'danger'});
         }
+        this.setState({toAccount: '',
+                        moneyAmount: '',
+                        content: '',});
     }
 
     handleInputChange = e =>{
@@ -234,6 +251,7 @@ export default class CreateDebt extends Component {
             <div className="customer-content">
                 <h1>Create debt reminder</h1>
                 <div className="customer-inner">
+                {this.state.showAlert == true ? <Alert variant={this.state.alertVariant} show={this.state.showAlert} onClose={this.closeAlert} dismissible>{this.state.alertMessage}</Alert> : null}
                     <Table striped bordered hover>
                         <thead>
                             <tr>

@@ -117,11 +117,10 @@ router.post('/verifyPayOTP', async (req, res)=>{
     const {otpNum} = req.body;
     const ret = await userModel.verifyPayOTP(otpNum);
     
-    if(ret == null){
+    if(!ret){
         return res.json({success: false});
-    }else{
-        return res.json({success: true});
     }
+    return res.json({success: true});
 });
 
 router.post('/payDebt', async (req, res)=>{
@@ -161,58 +160,36 @@ router.post('/paydebtHistory', async (req, res)=>{
     return res.json(ret);
 });
 
-router.get('/forgot/sendEmail/:username', async (req, res)=>{
-    console.log(req.params);
-    const {username} = req.params.username;
-    const users = await userModel.singleByUserName(username);
-    
-    if(users.length == 0){
+router.post('/changePassword', async (req, res)=>{
+    console.log(req.body);
+    const {userId, oldPass, newPass} = req.body;
+    const ret = await userModel.changePassword(userId, oldPass, newPass);
+    if(ret == null){
         return res.status(204).end();
     }
-    const email = users[0].email;
-    
-    const otp = await userModel.addForgotHistory(username);
 
-    if(otp == null){
-        return res.status(500).json({error: "Server error"});
+    if(ret == 0){
+        const response = {
+            success: false,
+            message: 'Old password is not match!'
+        }
+        return res.json(response);
     }
 
-    const html = `Dear <b>${username}</b>,
-    <br/>
-    This email is sent from DTBank!
-    <br/><br/>
-    Did you forgot your password?
-    <br/>
-    This is your OTP: <b>${otp}</b>
-    <br/>
-    The OTP will expire in three hours
-    <br/>
-    Thanks for using our service!`;
+    if(ret == 2){
+        const response = {
+            success: false,
+            message: 'Server error!'
+        }
+        return res.status(500).json(response);
+    }
 
-    await mailer.sendEmail('ronin32014@gmail.com', email, 'Please verify transfer OTP!', html);
-    return res.json({success: true});
-});
-
-router.post('/forgor/verify', async (req, res)=>{
-    console.log(req.body);
-    const {otpNum} = req.body;
-    const ret = await userModel.verifyForgotOTP(otpNum);
-    
-    if(ret == null){
-        return res.json({success: false});
-    }else{
-        return res.json({success: true});
+    if(ret == 1){
+        const response = {
+            success: true,
+            message: 'Change password success'
+        }
+        return res.json(response);
     }
 });
-
-router.post('/resetPassword', async (req, res)=>{
-    console.log(req.body);
-    const {username, password} = req.body;
-    const ret = await userModel.resetPassword(username, password);
-    if(ret.affectedRows){
-        return res.json({success: true});
-    }
-    return res.json({success: false});
-})
-
 module.exports = router;

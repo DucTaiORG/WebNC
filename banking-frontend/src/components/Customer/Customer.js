@@ -5,6 +5,7 @@ import ReceiverList from './ReceiverList';
 import TransferMoney from './TransferMoney';
 import CustomerHistory from './CustomerHistory';
 import DebtManagement from './DebtManagement';
+import ChangePassword from './ChangePassword';
 
 export default class Customer extends Component{
     render(){
@@ -20,6 +21,8 @@ export default class Customer extends Component{
                     <Link to="/customer/history">Transaction History</Link>
                     <hr/>
                     <Link to="/customer/debt/index">Debt Management</Link>
+                    <hr/>
+                    <Link to="/customer/changePassword">Change password</Link>
                 </div>
                 
                 <Route path='/customer/account' component={AccountList}/>
@@ -27,6 +30,7 @@ export default class Customer extends Component{
                 <Route path='/customer/transfer' component={TransferMoney}/>
                 <Route path='/customer/history' component={CustomerHistory}/>
                 <Route path='/customer/debt' component={DebtManagement}/>
+                <Route path='/customer/changePassword' component={ChangePassword}/>
             </div>
         );
     }

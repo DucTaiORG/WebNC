@@ -3,6 +3,7 @@ import TableRow from './TableRow';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import TransferModal from './TransferModal';
+import {Alert} from 'react-bootstrap';
 
 const getUserId = () =>{
     try {
@@ -29,7 +30,10 @@ export default class Index extends Component {
                 }
             ],
             currentId: 0,
-            showModal: false
+            showModal: false,
+            showAlert: false,
+            alertMessage: '',
+            alertVariant: ''
         };
     }
 
@@ -78,17 +82,29 @@ export default class Index extends Component {
                 }).catch(function (error) {
                     console.log(error.response);
                 });
-                alert('Delete debt success');  
+                this.setState({showAlert: true, 
+                    alertMessage: 'Delete debt successful', 
+                    alertVariant: 'success'});  
             }else{
-                alert('Delete debt fail');
+                this.setState({showAlert: true, 
+                    alertMessage: 'Delete debt fail', 
+                    alertVariant: 'danger'});
             }
         }).catch(function (error) {
             console.log(error.response);
+            this.setState({showAlert: true, 
+                alertMessage: 'Delete debt fail', 
+                alertVariant: 'danger'});
         });
+    }
+
+    closeAlert = () => {
+        this.setState({showAlert: false});
     }
 
     handlePay = id =>{
         this.setState({currentId: id});
+        let self = this;
         const accessToken = localStorage.getItem('accessToken');
         const refreshToken = localStorage.getItem('refreshToken');
     
@@ -113,14 +129,19 @@ export default class Index extends Component {
     
                 axios.post('http://localhost:8080/user/addPaydebtHistory', body, config).then((response) =>{
                     console.log(response.data);
-                    this.setState({showModal: true});
+                    self.setState({showModal: true});
                 }).catch(function (error){
                     console.log(error.response);
-                    alert(error.response.data);
+                    self.setState({showAlert: true, 
+                        alertMessage: error.response.data, 
+                        alertVariant: 'danger'});
                 })
             }
         }).catch((error) => {
             console.log(error.response);
+            this.setState({showAlert: true, 
+                alertMessage: error.response.data, 
+                alertVariant: 'danger'});
         });
     }
 
@@ -157,20 +178,30 @@ export default class Index extends Component {
                         }).catch(function (error) {
                             console.log(error.response);
                         });
-                        alert('Pay debt successful');
+                        this.setState({showAlert: true, 
+                            alertMessage: 'Pay debt successfull', 
+                            alertVariant: 'success'});
                     }else{
-                        alert(response.data.message);
+                        this.setState({showAlert: true, 
+                            alertMessage: response.data.message, 
+                            alertVariant: 'danger'});
                     }
                 }).catch(error => {
                     console.log(error.response);
-                    alert(error.response.data.message);
+                    this.setState({showAlert: true, 
+                        alertMessage: error.response.data.message, 
+                        alertVariant: 'danger'});
                 });
             }else{
-                alert('Verify fail!');
+                this.setState({showAlert: true, 
+                    alertMessage: `OTP not match`, 
+                    alertVariant: 'danger'});
             }
         }).catch((error)=>{
             console.log(error.response);
-            alert(`Pay debt fail`);
+            this.setState({showAlert: true, 
+                alertMessage: `Error occur`, 
+                alertVariant: 'danger'});
         });
         
         this.setState({
@@ -181,6 +212,7 @@ export default class Index extends Component {
     render() {
         return (
             <div className="admin-content">
+                {this.state.showAlert == true ? <Alert variant={this.state.alertVariant} show={this.state.showAlert} onClose={this.closeAlert} dismissible>{this.state.alertMessage}</Alert> : null}
                 <table className="table table-striped table-dark" style={{marginTop: 20}}>
                     <thead>
                     <tr>
