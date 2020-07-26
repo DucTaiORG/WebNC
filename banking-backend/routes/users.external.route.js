@@ -7,7 +7,6 @@ const crypto = require('crypto');
 
 const router = express.Router();
 
-const secretKey = "NganHangB";
 router.get('/', async (req, res) => {
     const list = await userModel.all();
     console.log(list);
@@ -32,9 +31,16 @@ router.get('/:accNum', async (req, res) => {
         return res.status(203).json({error});
     }
 
+    const bank = await authModel.detail(req.headers['x-partner-code']);
+    if(bank.length === 0){
+        const error = 'Can not identify bank';
+        return res.status(203).json({error});
+    }
+
     const headerSig = req.headers['x-signature'] || 0;
     
-    const sig = crypto.createHash('sha256').update(ts + secretKey).digest('hex');
+    const sig = crypto.createHash('sha256').update(ts + bank[0].secretKey).digest('hex');
+    console.log(sig);
     if(sig !== headerSig){
         const error = 'Not original request';
         return res.status(203).json({error});

@@ -15,6 +15,7 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/update', async(req, res) => {
+    console.log('transfer body: ' + JSON.stringify(req.body));
     const accNum = +req.body.accNum || -1;
     const moneyAmount = +req.body.moneyAmount || -1;
     if(accNum === -1 || moneyAmount === -1){
@@ -24,6 +25,7 @@ router.post('/update', async(req, res) => {
     }
 
     const ts = +req.headers['x-time'] || 0;
+    console.log('time: ' + ts);
     const currentTime = moment().valueOf();
     const expireTime = 600000; // 10 mins
 
@@ -35,15 +37,19 @@ router.post('/update', async(req, res) => {
     const bank = await authModel.detail(req.headers['x-partner-code']);
     if(bank.length === 0){
         const error = 'Can not identify bank';
+        console.log('Response: ' + error);
         return res.status(203).json({error});
     }
 
     const body = JSON.stringify(req.body);
     const headerHash = req.headers['x-hash'] || 0;
+    console.log('hash: ' + headerHash);
+    
     const hash = crypto.createHash('sha256').update(ts + body + bank[0].secretKey).digest('hex');
     
     if(hash !== headerHash){
         const error = 'Not original request';
+        console.log('Response: ' + error);
         return res.status(203).json({error});
     }
 
@@ -52,6 +58,7 @@ router.post('/update', async(req, res) => {
         const balance = Number(list[0].balance);
         const publicKeyArmored = bank[0].publicKey;
         const sigPGP = req.headers['x-signature-pgp'];
+        console.log('signature-pgp: ' + JSON.stringify(sigPGP));
         if(await verifyData(publicKeyArmored, sigPGP)){
             const result = await transferModel.update(Number(moneyAmount) + balance, accNum);
             const currentTime = moment().valueOf();
@@ -61,16 +68,20 @@ router.post('/update', async(req, res) => {
             const partnerId = bank[0].id;
             const tranferTime = moment(ts).format('YYYY-MM-DD HH:mm:ss');
             await transferModel.addToHistory(partnerId, moneyAmount, tranferTime, sigPGP);//Add to history
-            return res.status(203).json({
+            console.log("response: success");
+            return res.json({
                 status: "success",
                 responseSignature: mySig
             });
         }else{
             const error = "Verify fail";
-            res.json({error});
+            console.log('Response: ' + error);
+            
+            return res.json({error});
         }
     }else{
         const error = 'Account number is not exist';
+        console.log('Response: ' + error);
         return res.json({error});
     }
 })
@@ -91,9 +102,11 @@ async function signData(data){
 
 async function verifyData(publicKeyArmored, sig){
     const realpublicKey = publicKeyArmored.split("\\n").join("\n");
+    console.log(`public key: `);
     console.log(realpublicKey);
     const realSignature = sig.split("\\n").join("\n");
-    console.log(JSON.stringify(realSignature));
+    console.log(`signature: `);
+    console.log(realSignature);
     
     try {
         const verified = await openpgp.verify({

@@ -24,6 +24,7 @@ app.use('/api/user', require('./routes/users.external.route'));
 app.use('/api/transfer', require('./routes/transfer.external.route'));
 app.use('/client/rsa', require('./routes/linkrsa.route'));
 app.use('/client/pgp', require('./routes/linkpgp.route'));
+app.use('/client/pgp2', require('./routes/linkpgp2.route'));
 app.use('/api/auth', require('./routes/auth.route'));
 app.use('/user', verifyUser, require('./routes/users.internal.route'));
 app.use('/deposit', verifyEmployee, require('./routes/deposit.route'));
