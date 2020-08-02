@@ -22,7 +22,7 @@ const formValid = formErrors =>{
     return valid;
 };
 
-export default class TransferMoney extends Component{
+export default class TransferMoneyExt extends Component{
     constructor(props){
         super(props);
         this.state = {
@@ -46,6 +46,16 @@ export default class TransferMoney extends Component{
                     fullname: 'Bành Thị B'
                 }
             ],
+            bankList:[
+                {
+                    id: 7,
+                    bankName: 'Nhóm 25'
+                },
+                {
+                    id: 8,
+                    bankName: 'Nhóm 30'
+                }
+            ],
             receiver:{
                 accountNumber: '',
                 fullname: '',
@@ -53,6 +63,11 @@ export default class TransferMoney extends Component{
                 dateOfBirth: ''
             },
             selectedName: 'From list',
+            selectedBank: {
+                id: 0,
+                name: 'Bank List'
+            },
+            toBank: 1,
             transferFeeType: 1,
             showModal: false,
             showAlert: false,
@@ -92,19 +107,21 @@ export default class TransferMoney extends Component{
         });
     }
 
-
     handleInputChange = e =>{
         e.preventDefault();
-        console.log("Transfer Input change");
         const {name, value} = e.target;
         let formErrors = this.state.formErrors;
 
         switch(name){
             case "toAccount":
-                if(value.length != 9 && value.length != 0){
-                    formErrors.toAccount = "Must have 9 characters";
-                }else{
+                if(value.length == 0){
                     formErrors.toAccount = "";
+                }else{
+                    if(value.length < 6){
+                        formErrors.toAccount = "Invalid account number";
+                    }else{
+                        formErrors.toAccount = "";
+                    }
                 }
                 break;
             case "moneyAmount":
@@ -118,41 +135,33 @@ export default class TransferMoney extends Component{
                         formErrors.moneyAmount = "";
                     }
                 }
-                
                 break;
         }
         this.setState({formErrors, [name]: value});
+        this.setState({
+            receiver: null
+        });
 
         if(formValid(formErrors)){
-            const accessToken = localStorage.getItem('accessToken');
-            const refreshToken = localStorage.getItem('refreshToken');
 
-            const postBody = {
-                accessToken,
-                refreshToken
-            }
-
-            axios.post('http://localhost:8080/api/auth/refresh', postBody).then((response) => {
-                if(response.data.accessToken){
-                    localStorage.setItem('accessToken', response.data.accessToken);
-                    
-                    const config = {
-                        headers: {
-                            'x-access-token': localStorage.getItem('accessToken')
-                        }
-                    };
-
-                    axios.get('http://localhost:8080/user/byAccountNum/' + this.state.toAccount, config).then(response => {
+            if(this.state.selectedBank.id == 7 && this.state.toAccount.length > 0){
+                setTimeout(()=>{
+                    axios.get('http://localhost:8080/client/rsa/check/' + this.state.toAccount).then(response => {
                         console.log(response);
                         const responseData = {...response.data};
-                        this.setState({receiver: responseData});
+                        this.setState({
+                            receiver: {
+                                accountNumber: '',
+                                fullname: responseData.fullname,
+                                phoneNo: '',
+                                dateOfBirth: ''
+                            }
+                        });
                     }).catch(error=>{
                         console.log(error);
                     });
-                }
-            }).catch((error) => {
-                console.log(error.response);
-            });
+                }, 1000);   
+            }
         }else{
             this.setState({receiver: null});
         }
@@ -214,13 +223,15 @@ export default class TransferMoney extends Component{
                 'x-access-token' : localStorage.getItem('accessToken')
             }
         }
+    }
 
-        axios.get('http://localhost:8080/user/byAccountNum/' + eventKey, config).then(response => {
-            console.log(response);
-            const responseData = {...response.data};
-            this.setState({receiver: responseData});
-        }).catch(error=>{
-            console.log(error);
+    handleBankSelect = (eventKey, event) =>{
+        this.setState({toBank: eventKey});
+        this.setState({
+            selectedBank: {
+                id: eventKey,
+                name: event.target.textContent
+            }
         });
     }
 
@@ -286,12 +297,20 @@ export default class TransferMoney extends Component{
         });
     }
 
+
     render(){
         const {formErrors} = this.state;
         return (
             <div className="customer-content">
                 <h1>Transfer Money</h1>
                 <div className="customer-inner">
+                <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="success" title={this.state.selectedBank.name}>
+                    {
+                        this.state.bankList.map((bank, index)=>{
+                            return <Dropdown.Item eventKey={bank.id} key={index} onSelect={this.handleBankSelect}>{bank.bankName}</Dropdown.Item>
+                        })
+                    }
+                </DropdownButton>
                 {this.state.showAlert == true ? <Alert variant="danger" show={this.state.showAlert} onClose={this.closeAlert} dismissible>{this.state.alertMessage}</Alert> : null}
                     <Table striped bordered hover>
                         <thead>
@@ -314,7 +333,7 @@ export default class TransferMoney extends Component{
                             </tr>
                         </thead>
                         <tbody>
-                            {this.state.receiver !== null ? <Receiver obj={this.state.receiver}/> : null}
+                            <Receiver obj={this.state.receiver}/>
                         </tbody>
                     </Table>
                     <form onSubmit={this.handleSubmitForm}>

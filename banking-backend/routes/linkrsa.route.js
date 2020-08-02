@@ -10,7 +10,7 @@ const router = express.Router();
 const bankCode = 'partner34';
 const secretKey = md5('banking34');
 const privateKeyRSA = "-----BEGIN RSA PRIVATE KEY-----\nMIICWwIBAAKBgQCnWNNINaUTlo2ZxB3YoZf/drwG9vjJEoiAb9Zll1ufVCSLcvb+\na3Hag7xlCrEzhWKcUFv8N4SBxem03qzcE3VyfViYIO9REVYtjN8PiMcBpVNUFbk4\n1P6QcQdOpHPeGMNyaIcdqcIO9ms4ftwn8OIsPgd0ipT4NhaSGrNgB9QepwIDAQAB\nAoGAHVL3UwPzdUdAcN1ozXkjhWRs9lt4pONWgAsY6pxnNbgs3zK6DUMOpFfJP3ts\nKbcJ3JJITB3+Xi8sEMGkULwoLCrksnTNB9dvjflYEFzQU3IclvKxXRaodStVUYpE\nS2eUQ2kXJa0GqbuaAV6k8P1P5cVreA6Ga3uyOKcCxtwpsgECQQDjooyFtpgsvmeG\n6AjRWxRmLL3UxgP4MYSI4Vq0AAA8eysS6T8NwtAyMjXzHU3NPtp33Zp+9LS8Z5WX\n9TtYMCHnAkEAvDMeB9bNTUn87jNxm9p9G9bvyz3vCzkIQXBMlL9asqYEKT5POV7F\ncrq6IJqRr1f+SK1XSAbC8A9eY6LQ+z4FQQJARtfTu9lzypkHRyj3dZBO7O2HtqxZ\nl+hxQtg/jj1h1XDPmvcUNIgomzadK6g3CmVBQISrDE/D386s87nSWkPAiQJARd4M\nRgi+ivTuy1eZ06xXSeCPgTpq5hW0NOcF5yrq9uufG9if/MJsNt2Pf88iSqA2LLD9\neCXadNifyAmH3930gQJAVRxjFcEmdtedva5uH8Vz3Qceccdd5TG5xP6+jkkqG+DQ\nadIYlvqXJcfuvqRAxwzMjj3jOSPLVnEDBIZHVraaIA==\n-----END RSA PRIVATE KEY-----";
-router.get('/tracuu/:stk', async (req, res)=>{
+router.get('/check/:stk', async (req, res)=>{
     const soTaiKhoan = +req.params.stk || -1
     if(soTaiKhoan === -1){
         return res.status(400).json({
@@ -18,16 +18,20 @@ router.get('/tracuu/:stk', async (req, res)=>{
         });
     }
 
-    const ts = moment().unix();
-    const hash = crypto.createHash('sha256').update(ts + secretKey).digest('hex');
+    const ts = moment().valueOf();
+    const body = {
+        account_number: soTaiKhoan.toString()
+    }
+    const hash = md5(ts + JSON.stringify(body) + secretKey);
     const config = {
         headers: {
-            "X-BANK": bankCode,
-            "X-TIME": ts,
-            "X-HASH": hash
+            partnerCode: bankCode,
+            ts: ts,
+            sig: hash
         }
     }
-    axios.get('https://bankapp19.herokuapp.com/api/accounts/' + soTaiKhoan, config).then(function (response){
+    console.log(config);
+    axios.post('https://tts-bank.herokuapp.com/partner/check', body, config).then(function (response){
         console.log(response.data);
         res.json(response.data);
     }).catch(function (error){

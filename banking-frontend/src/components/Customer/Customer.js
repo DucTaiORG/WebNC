@@ -6,6 +6,7 @@ import TransferMoney from './TransferMoney';
 import CustomerHistory from './CustomerHistory';
 import DebtManagement from './DebtManagement';
 import ChangePassword from './ChangePassword';
+import TransferMoneyExt from './TransferMoneyExt';
 
 export default class Customer extends Component{
     render(){
@@ -18,6 +19,8 @@ export default class Customer extends Component{
                     <hr/>
                     <Link to="/customer/transfer">Transfer Money</Link>
                     <hr/>
+                    <Link to="/customer/transferext">Transfer Money External</Link>
+                    <hr/>
                     <Link to="/customer/history">Transaction History</Link>
                     <hr/>
                     <Link to="/customer/debt/index">Debt Management</Link>
@@ -28,6 +31,7 @@ export default class Customer extends Component{
                 <Route path='/customer/account' component={AccountList}/>
                 <Route path='/customer/receiverList' component={ReceiverList}/>
                 <Route path='/customer/transfer' component={TransferMoney}/>
+                <Route path='/customer/transferext' component={TransferMoneyExt}/>
                 <Route path='/customer/history' component={CustomerHistory}/>
                 <Route path='/customer/debt' component={DebtManagement}/>
                 <Route path='/customer/changePassword' component={ChangePassword}/>

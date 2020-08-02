@@ -3,11 +3,11 @@ const { promisify } = require('util');
 
 const pool = mysql.createPool({
     connectionLimit: 100,
-    host: 'localhost',
+    host: 'remotemysql.com',
     port: 3306,
-    user: 'root',
-    password: '',
-    database: 'banking'
+    user: 'mPryHECQJh',
+    password: 'GEJ1cBL382',
+    database: 'mPryHECQJh'
 });
 
 const pool_query = promisify(pool.query).bind(pool);

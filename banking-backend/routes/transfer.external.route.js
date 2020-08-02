@@ -24,12 +24,12 @@ router.post('/update', async(req, res) => {
         })
     }
 
-    const ts = +req.headers['x-time'] || 0;
+    const ts = req.headers['x-time'] || 0;
     console.log('time: ' + ts);
     const currentTime = moment().valueOf();
     const expireTime = 600000; // 10 mins
 
-    if(currentTime - ts > expireTime){
+    if(currentTime - Number(ts) > expireTime){
         const error = 'Expired request';
         return res.status(203).json({error});
     }
@@ -39,6 +39,38 @@ router.post('/update', async(req, res) => {
         const error = 'Can not identify bank';
         console.log('Response: ' + error);
         return res.status(203).json({error});
+    }
+    if(bank[0].secretKey == '30Bank'){
+        const encryptedMessage = req.body.message;
+        const list = await transferModel.getBalance(accNum);
+        if(list.length > 0){
+            const balance = Number(list[0].balance);
+            const publicKeyArmored = bank[0].publicKey;
+            if(await decryptedAndVerify(publicKeyArmored, encryptedMessage)){
+                const result = await transferModel.update(Number(moneyAmount) + balance, accNum);
+                const currentTime = moment().valueOf();
+                const data = moneyAmount + ', ' + accNum + ', ' + currentTime;
+                console.log(data);
+                const mySig = await signData(data);
+                const partnerId = bank[0].id;
+                const tranferTime = moment(Number(ts)).format('YYYY-MM-DD HH:mm:ss');
+                await transferModel.addToHistory(partnerId, moneyAmount, tranferTime, "");//Add to history
+                console.log("response: success");
+                return res.json({
+                    status: "success",
+                    responseSignature: mySig
+                });
+            }else{
+                const error = "Verify fail";
+                console.log('Response: ' + error);
+                
+                return res.json({error});
+            }
+        }else{
+            const error = 'Account number is not exist';
+            console.log('Response: ' + error);
+            return res.json({error});
+        }
     }
 
     const body = JSON.stringify(req.body);
@@ -122,6 +154,25 @@ async function verifyData(publicKeyArmored, sig){
             return false;
         }
     } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
+async function decryptedAndVerify(publicKey, encrypredData){
+    const privateKeyArmored =  config.privatePGPArmored; // encrypted private key
+    const passphrase = config.passpharse; // what the private key is encrypted with
+    try{
+        const { keys: [privateKey] } =  await openpgp.key.readArmored(privateKeyArmored);
+        await privateKey.decrypt(passphrase);
+        const { data: decrypted } = await openpgp.decrypt({
+            message: await openpgp.message.readArmored(encrypredData),              // parse armored message
+            publicKeys: (await openpgp.key.readArmored(publicKey)).keys, // for verification (optional)
+            privateKeys: [privateKey]                                           // for decryption
+        });
+        console.log(decrypted);
+        return true;
+    }catch (error) {
         console.log(error);
         return false;
     }

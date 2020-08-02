@@ -6,6 +6,13 @@ export default class Receiver extends Component {
     }
 
     render() {
+        if(this.props.obj == null || this.props.obj.fullname.length == 0){
+            return <tr>
+                <td colSpan='4' style={{textAlign: 'center'}}>
+                No information
+                </td>
+                </tr>
+        }
         return (
             <tr>
                 <td>
