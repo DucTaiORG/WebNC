@@ -32,6 +32,7 @@ app.use('/employee', verifyAdmin, require('./routes/employee.route'));
 app.use('/partner', verifyAdmin, require('./routes/partner.route'));
 app.use('/account', verifyUser, require('./routes/account.route'));
 app.use('/transfer', verifyUser, require('./routes/transfer.internal.route'));
+app.use('/transferExt', require('./routes/transfer.external.route'));
 app.use('/contact', require('./routes/contact.route'));
 /*app.get('/test', (req, res)=>{
     return res.json({rand: randToken.generator({

@@ -98,7 +98,7 @@ router.post('/addPaydebtHistory', async (req, res)=>{
     const time = moment().format('YYYY-MM-DD HH:mm:ss');
     const html = `Dear <b>${debtor}</b>,
     <br/>
-    This email is sent from DTBank!
+    This email is sent from PTBank!
     <br/><br/>
     You have transfered <b>${money_amount}</b> from <b>${debtor}</b> account number to <b>${lender}</b> account number at ${time}
     <br/>

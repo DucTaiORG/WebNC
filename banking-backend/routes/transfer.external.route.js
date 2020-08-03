@@ -1,5 +1,6 @@
 const express = require('express');
 const transferModel = require('../models/transferMoney.model');
+const transferModel1 = require('../models/transfer.model');
 const authModel = require('../models/auth.model');
 const moment = require('moment');
 const openpgp = require('openpgp');
@@ -116,7 +117,7 @@ router.post('/update', async(req, res) => {
         console.log('Response: ' + error);
         return res.json({error});
     }
-})
+});
 
 async function signData(data){
     const privateKeyArmored =  config.privatePGPArmored; // encrypted private key

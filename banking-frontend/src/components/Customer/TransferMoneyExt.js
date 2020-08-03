@@ -138,11 +138,14 @@ export default class TransferMoneyExt extends Component{
                 break;
         }
         this.setState({formErrors, [name]: value});
-        this.setState({
-            receiver: null
-        });
-
-        if(formValid(formErrors)){
+        if(name == 'toAccount'){
+            this.setState({
+                receiver: null
+            });
+        }
+        
+        console.log(name);
+        if(formValid(formErrors) && name == 'toAccount'){
 
             if(this.state.selectedBank.id == 7 && this.state.toAccount.length > 0){
                 setTimeout(()=>{
@@ -162,10 +165,12 @@ export default class TransferMoneyExt extends Component{
                     });
                 }, 1000);   
             }
-        }else{
+        }else if(name != 'moneyAmount'){
             this.setState({receiver: null});
         }
     }
+
+    
 
     closeAlert = () => {
         this.setState({showAlert: false});
@@ -188,10 +193,11 @@ export default class TransferMoneyExt extends Component{
                     localStorage.setItem('accessToken', response.data.accessToken);
 
                     const submitForm = {
-                        fromAcc: state.loggedAccount.accountNumber,
-                        toAcc: state.toAccount,
-                        moneyAmount: state.moneyAmount,
-                        transferFeeType: state.transferFeeType
+                        sender_account_number: state.loggedAccount.accountNumber,
+                        receiver_account_number: state.toAccount,
+                        money: state.moneyAmount,
+                        type_fee: state.transferFeeType,
+                        message: "Chuyen khoan"
                     };
 
                     const config = {
@@ -200,7 +206,7 @@ export default class TransferMoneyExt extends Component{
                         }
                     }
 
-                    axios.post('http://localhost:8080/transfer/addHistory', submitForm, config).then((response)=>{
+                    axios.post('http://localhost:8080/client/rsa/addHistory', submitForm, config).then((response)=>{
                         console.log(response);
                     }).catch((error)=>{
                         console.log(error.response);
@@ -233,6 +239,24 @@ export default class TransferMoneyExt extends Component{
                 name: event.target.textContent
             }
         });
+        setTimeout(()=>{
+            if(this.state.selectedBank.id == 7 && this.state.toAccount.length > 0){
+                axios.get('http://localhost:8080/client/rsa/check/' + this.state.toAccount).then(response => {
+                    console.log(response);
+                    const responseData = {...response.data};
+                    this.setState({
+                        receiver: {
+                            accountNumber: '',
+                            fullname: responseData.fullname,
+                            phoneNo: '',
+                            dateOfBirth: ''
+                        }
+                    });
+                }).catch(error=>{
+                    console.log(error);
+                }); 
+            }
+        }, 1000);
     }
 
     handleRadioButton = (event)=>{
@@ -252,10 +276,11 @@ export default class TransferMoneyExt extends Component{
         };
 
         const submitTransfer = {
-            fromAcc: this.state.loggedAccount.accountNumber,
-            toAcc: this.state.toAccount,
-            moneyAmount: this.state.moneyAmount,
-            transferFeeType: this.state.transferFeeType,
+            sender_account_number: this.state.loggedAccount.accountNumber,
+            receiver_account_number: this.state.toAccount,
+            money: this.state.moneyAmount,
+            type_fee: this.state.transferFeeType,
+            message: "Gửi ăn mừng Hè 2020",
             otpNum: otp
         }
 
@@ -268,8 +293,8 @@ export default class TransferMoneyExt extends Component{
         axios.post('http://localhost:8080/transfer/verify', submitVerify, config).then((response)=>{
             console.log(response);
             if(response.data.success){
-                axios.post('http://localhost:8080/transfer', submitTransfer, config).then(response => {
-                    if(response.data.success){
+                axios.post('http://localhost:8080/client/rsa/recharge', submitTransfer, config).then(response => {
+                    if(response.data.status == "RSA success"){
                         axios.get('http://localhost:8080/user/byUserId/' + getUserId(), config).then(response => {
                             console.log(response);
                             const responseData = {...response.data};

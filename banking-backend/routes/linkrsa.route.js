@@ -1,9 +1,11 @@
 const express = require('express');
-const crypto = require('crypto');
 const moment = require('moment');
 const axios = require('axios');
 const md5 = require('md5');
 const NodeRSA = require('node-rsa');
+const transferModel = require('../models/transfer.model');
+const usersModel = require('../models/users.model');
+const mailer = require('../utils/mailer');
 
 const router = express.Router();
 
@@ -39,9 +41,9 @@ router.get('/check/:stk', async (req, res)=>{
         res.send(error.response.data);
     })
     
-})
+});
 
-router.post('/naptien', async (req, res) => {
+router.post('/recharge', async (req, res) => {
     // const soTaiKhoan = +req.body.SoTaiKhoan || -1;
     // const soTien = +req.body.SoTien || -1;
     // if(soTaiKhoan === -1 || soTien === -1){
@@ -50,14 +52,16 @@ router.post('/naptien', async (req, res) => {
     //     });
     // }
     console.log(privateKeyRSA);
-    const postBody = {
+    /*const postBody = {
         "sender_account_number": "123456789", 
         "receiver_account_number": "120204", 
         "money": 100000, 
         "type_fee": "0",   
         "message": "Gửi ăn mừng Hè 2020"
 
-    }
+    }*/
+
+    const postBody = req.body;
 
     const ts = moment().valueOf();
     const data = JSON.stringify(postBody);
@@ -81,6 +85,36 @@ router.post('/naptien', async (req, res) => {
         console.log(error.response.data);
         res.send(error.response.data);
     })
-})
+});
+
+router.post('/addHistory', async (req, res)=>{
+    const toAcc = Number(req.body.receiver_account_number);
+    const fromAcc = req.body.sender_account_number;
+    const moneyAmount = Number(req.body.money);
+    console.log(`${fromAcc}, ${toAcc}, ${moneyAmount}`);
+    const ret = await transferModel.addToHistory(fromAcc, toAcc, moneyAmount);
+    const userList = await usersModel.detailByAccNumber(fromAcc);
+    const email = userList[0].email;
+
+    if(ret === null){
+        return res.status(500).json("Server error");
+    }
+
+    const time = moment().format('YYYY-MM-DD HH:mm:ss');
+    const html = `Dear <b>${fromAcc}</b>,
+    <br/>
+    This email is sent from PTBank!
+    <br/><br/>
+    You have transfered <b>${moneyAmount}</b> from <b>${fromAcc}</b> account number to <b>${toAcc}</b> account number at ${time}
+    <br/>
+    This is your OTP: <b>${ret}</b>
+    <br/>
+    The OTP will expire in three hours
+    <br/>
+    Thanks for using our service!`;
+
+    await mailer.sendEmail('ronin32014@gmail.com', email, 'Please verify transfer OTP!', html);
+    return res.json({success: true});
+});
 
 module.exports = router;
