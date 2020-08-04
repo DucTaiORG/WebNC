@@ -27,4 +27,9 @@ router.get('/history/:id', async (req,res)=>{
     return res.json(list);
 })
 
+router.get('/totalMoney', async(req, res) => {
+    const total_money = await partnerModel.getTotalMoney();
+    return res.json(total_money)
+})
+
 module.exports = router;
