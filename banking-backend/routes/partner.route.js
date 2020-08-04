@@ -32,4 +32,14 @@ router.get('/totalMoney', async(req, res) => {
     return res.json(total_money)
 })
 
+router.get('/filteredDate', async(req, res) => {
+    var startDate = req.body.startDate
+    var endDate = req.body.endDate
+    const ret = await partnerModel.getFilteredDate(startDate, endDate)
+    ret.forEach(element => {
+        element.transfer_time = moment(element.transfer_time).format('HH:mm:ss DD/MM/YYYY'); 
+    });
+    return res.json(ret)
+})
+
 module.exports = router;
