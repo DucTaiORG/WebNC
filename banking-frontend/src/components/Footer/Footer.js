@@ -22,6 +22,7 @@ export default class Footer extends Component{
                         <h4>Email</h4>
                         <ul>
                             <li>lductai98@gmail.com</li>
+                            <li>hoangphatho@gmail.com</li>
                         </ul>
                     </div>
                 </div>
