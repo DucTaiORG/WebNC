@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Table, Dropdown, DropdownButton } from 'react-bootstrap';
 import HistoryRow from './HistoryRow';
 import axios from 'axios';
+import { DatePicker, DatePickerInput } from 'rc-datepicker';
 
 export default class HistoryAdmin extends Component {
     constructor(props) {
@@ -44,8 +45,7 @@ export default class HistoryAdmin extends Component {
                         'x-access-token': localStorage.getItem('accessToken')
                     }
                 };
-                // m muốn lấy hết dữ liệu đó đổ lên hả ? K phai api đó. Để t lấy api. T muốn lấy cái số gắn lên chỗ đó thôi
-                //
+
                 axios.get('http://localhost:8080/partner/allBank', config).then(response => {
                     console.log(response);
                     this.setState(state => {
@@ -71,7 +71,6 @@ export default class HistoryAdmin extends Component {
                     const list = response.data[0].total_money;
                     console.log("list", list);
                     this.setState({ total: list });
-                    //m muon no hien thi ra cho nao
                 }).catch(error => {
                     console.log(error);
                 });
@@ -101,6 +100,7 @@ export default class HistoryAdmin extends Component {
         return (
             <div className="admin-content">
                 <div className="admin-inner">
+                <DatePicker/>
                     <div className="row">
                         <div className="col-md-4">
                             <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="warning" title="Select Bank">
