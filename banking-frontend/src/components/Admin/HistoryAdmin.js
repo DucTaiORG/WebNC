@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
-import { Table, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Table, Dropdown, DropdownButton, Button } from 'react-bootstrap';
 import HistoryRow from './HistoryRow';
 import axios from 'axios';
-import { DatePicker, DatePickerInput } from 'rc-datepicker';
+import moment from 'moment';
+import { SingleDatePicker, DateRangePicker } from 'react-date-range';
+import { DatePicker } from 'antd';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
+import 'antd/dist/antd.css';
+
+const { RangePicker } = DatePicker;
 
 export default class HistoryAdmin extends Component {
     constructor(props) {
@@ -24,7 +31,8 @@ export default class HistoryAdmin extends Component {
                 }
             ],
 
-            selectedBank: 0
+            startDate: "",
+            endDate: ""
         }
     }
 
@@ -96,11 +104,38 @@ export default class HistoryAdmin extends Component {
             console.log(error);
         });
     }
+
+    handleDateSelect = (range) => {
+        const valueOfInput1 = range[0].format();
+        const valueOfInput2 = range[1].format();
+        const body = {
+            startDate: valueOfInput1.slice(0, 10),
+            endDate: valueOfInput2.slice(0, 10)
+        }
+        const config = {
+            headers: {
+                'x-access-token': localStorage.getItem('accessToken')
+            }
+        };
+        axios.post('http://localhost:8080/partner/filteredDate', body, config).then(function (response) {
+            console.log(response);
+            const list = [...response.data];
+            this.setState({ historyArray: list });
+        }).catch(function (error) {
+            console.log(error.response);
+        })
+    }
+
+
     render() {
+        const selectionRange = {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection',
+        }
         return (
             <div className="admin-content">
                 <div className="admin-inner">
-                <DatePicker/>
                     <div className="row">
                         <div className="col-md-4">
                             <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="warning" title="Select Bank">
@@ -111,10 +146,13 @@ export default class HistoryAdmin extends Component {
                                 }
                             </DropdownButton>
                         </div>
-                        <div class="col-md-4"></div>
-                        <div class="col-md-4"><strong>Total:</strong> {this.state.total}</div>
+                        <div class="col-md-5">
+                            <RangePicker onChange={this.handleDateSelect} />
+                        </div>
+
 
                     </div>
+                    <div class="col-md-4"><strong>Total:</strong> {this.state.total}</div>
                     <Table striped bordered hover>
                         <thead>
                             <tr>
