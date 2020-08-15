@@ -46,7 +46,7 @@ class App extends Component {
       <div className="App-container">
         <header className="App-header">
           <img src={logo} alt="logo" width="90" height="90" className="App-logo"/>
-          <h1>Welcome to my bank </h1>
+          <h1 style={{textAlign: 'center'}}>Welcome to PT Bank </h1>
         </header>
         <Navigation/>
         <Switch>

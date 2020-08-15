@@ -64,10 +64,12 @@ module.exports = {
                 const {userId} = payload;
                 const rows = await userModel.singleByUserId(userId);
                 const userRole = rows[0].userRole;
+
                 if(userRole !== 3){
                     next(createError(401, 'Do not allow to access resource'));
                     return;
                 }
+                
                 next();
             });
         }else{

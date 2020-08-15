@@ -28,7 +28,7 @@ export default class Footer extends Component{
                 </div>
                 <div className="row">
                     <h6 className="col-sm">
-                        &copy;{new Date().getFullYear()} DT BANK INC | All right reserved | Terms Of Service | Privacy
+                        &copy;{new Date().getFullYear()} PT BANK INC | All right reserved | Terms Of Service | Privacy
                     </h6>
                 </div>
             </div>
