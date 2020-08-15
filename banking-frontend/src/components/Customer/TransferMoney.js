@@ -37,14 +37,6 @@ export default class TransferMoney extends Component{
                 balance: 10000
             },
             receiverList:[
-                {
-                    accountNumber: 113333333,
-                    fullname: 'Bành Thị A'
-                },
-                {
-                    accountNumber: 112222222,
-                    fullname: 'Bành Thị B'
-                }
             ],
             receiver:{
                 accountNumber: '',
@@ -83,6 +75,15 @@ export default class TransferMoney extends Component{
                     console.log(response);
                     const responseData = {...response.data};
                     this.setState({loggedAccount: responseData});
+                }).catch(error=>{
+                    console.log(error);
+                });
+
+                axios.get('http://localhost:8080/contact/' + getUserId()).then(response => {
+                    const responseData = response.data.slice(0);
+                    this.setState({receiverList: responseData}, ()=>{
+                        console.log(this.state.receiverList);
+                    });
                 }).catch(error=>{
                     console.log(error);
                 });
@@ -216,9 +217,10 @@ export default class TransferMoney extends Component{
         }
 
         axios.get('http://localhost:8080/user/byAccountNum/' + eventKey, config).then(response => {
-            console.log(response);
             const responseData = {...response.data};
-            this.setState({receiver: responseData});
+            if(response.data.length > 0){
+                this.setState({receiver: responseData});
+            }
         }).catch(error=>{
             console.log(error);
         });
@@ -325,7 +327,7 @@ export default class TransferMoney extends Component{
                                 <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="warning" title={this.state.selectedName}>
                                     {
                                         this.state.receiverList.map((receiver, index)=>{
-                                            return <Dropdown.Item eventKey={receiver.accountNumber} key={index} onSelect={this.handleItemSelect}>{receiver.fullname}</Dropdown.Item>
+                                            return <Dropdown.Item eventKey={receiver.accountNumber} key={index} onSelect={this.handleItemSelect}>{receiver.rememberName}</Dropdown.Item>
                                         })
                                     }
                                 </DropdownButton>
