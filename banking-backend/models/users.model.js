@@ -77,6 +77,10 @@ const self = module.exports = {
         return db.load(`select users.id, users.username, users.password, users.fullname, users.dateOfBirth, users.email, users.phoneNo, users.userRole from users where id = ${userId}`);
     },
 
+    getAllPaymentAccount: async(accountNumber) => {
+        return db.load(`SELECT * FROM paymentaccount WHERE accountNumber = ${accountNumber}`);
+    },
+
     addToDepositHistory: async (accNum, moneyAmount) => {
         const entity = {
             "account_num": accNum,
@@ -108,9 +112,12 @@ const self = module.exports = {
             "receiveUserID": receiveUserID
         }
 
-        
-        const result = await db.add(entity, 'users_add_users');
-        return result;
+        try {
+            const result = await db.add(entity, 'users_add_users');
+            return result;
+        } catch (error) {
+            return null;
+        }
     },
 
     showUserContact: userId => {

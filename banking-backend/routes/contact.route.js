@@ -5,10 +5,22 @@ const { route } = require('./users.external.route');
 const router = express.Router();
 
 router.post('/:id/add', async (req, res) => {
-    const addToReceiveAccount = await userModel.addToReceiveAccount(req.body.accountNumber, req.body.rememberName);
-    const loadContact = await userModel.loadContactWithAccountNumber(req.body.accountNumber);
-    const addContact = await userModel.addContact(req.params.id, loadContact[0].id);
-    return res.json(addContact);
+    const listPaymentAccount = await userModel.getAllPaymentAccount(req.body.accountNumber);
+    console.log(listPaymentAccount.length + "");
+    if(listPaymentAccount.length === 0){
+        console.log("Account not existed");
+        return res.status(203).end();
+    } else{
+        const addToReceiveAccount = await userModel.addToReceiveAccount(req.body.accountNumber, req.body.rememberName);
+        const loadContact = await userModel.loadContactWithAccountNumber(req.body.accountNumber);
+        const addContact = await userModel.addContact(req.params.id, loadContact[0].id);
+        if(addContact == null){
+            console.log("Contact already existed");
+            return res.status(204).end();
+        } else{
+            return res.json(addContact);
+        }
+    }
 });
 
 router.get('/:id', async(req, res) => {

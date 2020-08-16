@@ -64,13 +64,20 @@ export default class ReceiverList extends Component {
         }
         axios.post(`http://localhost:8080/contact/${userId}/add`, entity).then((response) => {
           console.log(response.data);
-          alert("Added Successfully");
-          axios.get(`http://localhost:8080/contact/${userId}`).then((response) => {
-            const contactList = [...response.data];
-            this.setState({ list: contactList });
-          }).catch(error => {
-            console.log(error);
-          });
+          if(response.status == 203){
+            alert("This account not existed");
+          } else if(response.status == 204){
+            console.log("This contact already existed");
+            alert("This contact already existed");
+          } else{
+            alert("Added Successfully");
+            axios.get(`http://localhost:8080/contact/${userId}`).then((response) => {
+              const contactList = [...response.data];
+              this.setState({ list: contactList });
+            }).catch(error => {
+              console.log(error);
+            });
+          }
         })
 
       }
@@ -153,8 +160,8 @@ export default class ReceiverList extends Component {
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Remember Name</th>
                       <th>Account Number</th>
+                      <th>Remember Name</th>
                       <th>Edit</th>
                       <th>Delete</th>
                     </tr>
