@@ -32,7 +32,7 @@ router.get('/totalMoney', async(req, res) => {
     return res.json(total_money)
 })
 
-router.get('/filteredDate', async(req, res) => {
+router.post('/filteredDate', async(req, res) => {
     var startDate = req.body.startDate
     var endDate = req.body.endDate
     const ret = await partnerModel.getFilteredDate(startDate, endDate)

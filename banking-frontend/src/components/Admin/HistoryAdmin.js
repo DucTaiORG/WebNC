@@ -106,24 +106,56 @@ export default class HistoryAdmin extends Component {
     }
 
     handleDateSelect = (range) => {
-        const valueOfInput1 = range[0].format();
-        const valueOfInput2 = range[1].format();
-        const body = {
-            startDate: valueOfInput1.slice(0, 10),
-            endDate: valueOfInput2.slice(0, 10)
-        }
         const config = {
             headers: {
                 'x-access-token': localStorage.getItem('accessToken')
             }
         };
-        axios.post('http://localhost:8080/partner/filteredDate', body, config).then(function (response) {
-            console.log(response);
-            const list = [...response.data];
-            this.setState({ historyArray: list });
-        }).catch(function (error) {
-            console.log(error.response);
-        })
+        if (range != null) {
+            const valueOfInput1 = range[0].format();
+            const valueOfInput2 = range[1].format();
+            const body = {
+                startDate: valueOfInput1.slice(0, 10),
+                endDate: valueOfInput2.slice(0, 10)
+            }
+            console.log(body);
+            axios.post('http://localhost:8080/partner/filteredDate', body, config).then(function (response) {
+                console.log(response);
+                const list = [...response.data];
+                this.setState({ historyArray: list });
+            }).catch(function (error) {
+                console.log(error.response);
+            })
+        } else{
+            axios.get('http://localhost:8080/partner/allBank', config).then(response => {
+                    console.log(response);
+                    this.setState(state => {
+                        const bankList = [...state.bankList, ...response.data];
+                        console.log(bankList);
+                        return {
+                            bankList
+                        }
+                    });
+                }).catch(error => {
+                    console.log(error);
+                });
+
+                axios.get('http://localhost:8080/partner/allHistory', config).then(response => {
+                    console.log(response);
+                    const list = [...response.data];
+                    this.setState({ historyArray: list });
+                }).catch(error => {
+                    console.log(error);
+                });
+                axios.get('http://localhost:8080/partner/totalMoney', config).then(response => {
+                    console.log("total", response);
+                    const list = response.data[0].total_money;
+                    console.log("list", list);
+                    this.setState({ total: list });
+                }).catch(error => {
+                    console.log(error);
+                });
+        }
     }
 
 
