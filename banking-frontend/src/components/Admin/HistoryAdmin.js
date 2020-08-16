@@ -119,12 +119,12 @@ export default class HistoryAdmin extends Component {
                 endDate: valueOfInput2.slice(0, 10)
             }
             console.log(body);
-            axios.post('http://localhost:8080/partner/filteredDate', body, config).then(function (response) {
-                console.log(response);
+            axios.post('http://localhost:8080/partner/filteredDate', body, config).then((response)=>{
                 const list = [...response.data];
+                console.log(list);
                 this.setState({ historyArray: list });
-            }).catch(function (error) {
-                console.log(error.response);
+            }).catch((error)=>{
+                console.log(error);
             })
         } else{
             axios.get('http://localhost:8080/partner/allBank', config).then(response => {
@@ -178,13 +178,13 @@ export default class HistoryAdmin extends Component {
                                 }
                             </DropdownButton>
                         </div>
-                        <div class="col-md-5">
+                        <div className="col-md-5">
                             <RangePicker onChange={this.handleDateSelect} />
                         </div>
 
 
                     </div>
-                    <div class="col-md-4"><strong>Total:</strong> {this.state.total}</div>
+                    <div className="col-md-4"><strong>Total:</strong> {this.state.total}</div>
                     <Table striped bordered hover>
                         <thead>
                             <tr>
