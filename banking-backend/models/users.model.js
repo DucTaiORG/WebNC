@@ -78,7 +78,7 @@ const self = module.exports = {
     },
 
     getAllPaymentAccount: async(accountNumber) => {
-        return db.load(`SELECT * FROM paymentaccount WHERE accountNumber = ${accountNumber}`);
+        return db.load(`SELECT * FROM paymentaccount JOIN users ON paymentaccount.userId = users.id WHERE paymentaccount.accountNumber = ${accountNumber}`);
     },
 
     addToDepositHistory: async (accNum, moneyAmount) => {
