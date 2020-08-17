@@ -78,8 +78,9 @@ router.post('/recharge', async (req, res) => {
         }
     }
     
-    axios.post('https://tts-bank.herokuapp.com/partner/recharge', postBody, config).then(function (response){
+    axios.post('https://tts-bank.herokuapp.com/partner/recharge', postBody, config).then(async (response)=>{
         console.log(response.data);
+        await usersModel.subtractMoney(postBody.sender_account_number, postBody.money, postBody.otpNum);
         res.json(response.data);
     }).catch(function (error){
         console.log(error.response.data);

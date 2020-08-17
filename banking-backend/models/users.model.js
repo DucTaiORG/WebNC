@@ -153,7 +153,6 @@ const self = module.exports = {
                             JOIN paymentaccount ON users.id = paymentaccount.userId 
                             JOIN transfer_history ON transfer_history.from_account = paymentaccount.accountNumber OR transfer_history.to_account = paymentaccount.accountNumber
                                 WHERE users.id = ${userId} AND transfer_history.isSuccess = true
-                                    GROUP BY transfer_history.time
                                     ORDER BY transfer_history.time DESC`);
     },
 
@@ -180,7 +179,6 @@ const self = module.exports = {
                             JOIN paymentaccount ON users.id = paymentaccount.userId 
                             JOIN debt ON debt.lender = paymentaccount.accountNumber OR debt.debtor = paymentaccount.accountNumber
                                 WHERE users.id = ${userId} and debt.isActive = true
-                                GROUP BY debt.time
                                 ORDER BY debt.time DESC`);
     },
 
@@ -301,7 +299,6 @@ const self = module.exports = {
                             JOIN debt ON debt.lender = paymentaccount.accountNumber OR debt.debtor = paymentaccount.accountNumber
                             JOIN pay_debt_history on debt.id = pay_debt_history.debtId
                                 WHERE users.id = ${userId} AND pay_debt_history.isSuccess = true
-                                    GROUP BY pay_debt_history.time
                                     ORDER BY pay_debt_history.time DESC`);
     },
 
@@ -376,5 +373,18 @@ const self = module.exports = {
         }else{
             return 2;
         }
+    },
+
+    subtractMoney: async (accountNumber, money, otpNumber)=>{
+        const account = await self.singleByAccountNumber(accountNumber);
+        if(account.length === 0){
+            return null;
+        }
+
+        const balance = account[0].balance;
+        const moneyUpdate = balance - money;
+
+        await db.update('paymentaccount', {"balance": moneyUpdate}, {"accountNumber": accountNumber});
+        await db.update('transfer_history', {"otp_number": 0, "isSuccess": true}, {"otp_number": otpNumber});
     }
 }

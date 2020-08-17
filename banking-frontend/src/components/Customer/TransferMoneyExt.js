@@ -143,8 +143,6 @@ export default class TransferMoneyExt extends Component{
                 receiver: null
             });
         }
-        
-        console.log(name);
         if(formValid(formErrors) && name == 'toAccount'){
 
             if(this.state.selectedBank.id == 7 && this.state.toAccount.length > 0){
@@ -165,6 +163,29 @@ export default class TransferMoneyExt extends Component{
                     });
                 }, 1000);   
             }
+
+            if(this.state.selectedBank.id == 8 && this.state.toAccount.length > 0){
+                setTimeout(()=>{
+                    const body = {
+                        toAccount: this.state.toAccount
+                    }
+                    axios.post('http://localhost:8080/client/pgp2/check', body).then(response => {
+                        const responseData = {...response.data.data};
+                        console.log(responseData);
+                        this.setState({
+                            receiver: {
+                                accountNumber: responseData.account_number,
+                                fullname: responseData.account_name,
+                                phoneNo: '',
+                                dateOfBirth: ''
+                            }
+                        });
+                    }).catch(error=>{
+                        console.log(error);
+                    });
+                }, 1000);   
+            }
+
         }else if(name != 'moneyAmount'){
             this.setState({receiver: null});
         }
@@ -256,6 +277,26 @@ export default class TransferMoneyExt extends Component{
                     console.log(error);
                 }); 
             }
+
+            if(this.state.selectedBank.id == 8 && this.state.toAccount.length > 0){
+                const body = {
+                    toAccount: this.state.toAccount
+                }
+                axios.post('http://localhost:8080/client/pgp2/check', body).then(response => {
+                    const responseData = {...response.data.data};
+                    console.log(responseData);
+                    this.setState({
+                        receiver: {
+                            accountNumber: responseData.account_number,
+                            fullname: responseData.account_name,
+                            phoneNo: '',
+                            dateOfBirth: ''
+                        }
+                    });
+                }).catch(error=>{
+                    console.log(error);
+                }); 
+            }
         }, 1000);
     }
 
@@ -284,6 +325,13 @@ export default class TransferMoneyExt extends Component{
             otpNum: otp
         }
 
+        const submitTransfer2 = {
+            sender: this.state.loggedAccount.accountNumber,
+            toAccount: this.state.toAccount,
+            moneyAmount: this.state.moneyAmount,
+            otpNum: otp
+        }
+
         const config = {
             headers: {
                 'x-access-token' : localStorage.getItem('accessToken')
@@ -293,25 +341,48 @@ export default class TransferMoneyExt extends Component{
         axios.post('http://localhost:8080/transfer/verify', submitVerify, config).then((response)=>{
             console.log(response);
             if(response.data.success){
-                axios.post('http://localhost:8080/client/rsa/recharge', submitTransfer, config).then(response => {
-                    if(response.data.status == "RSA success"){
-                        axios.get('http://localhost:8080/user/byUserId/' + getUserId(), config).then(response => {
-                            console.log(response);
-                            const responseData = {...response.data};
-                            this.setState({loggedAccount: responseData});
-                        }).catch(error=>{
-                            console.log(error);
-                        });
-                        this.setState({showAlert: true, alertMessage: 'Transfer successful'});
-                    }
-                }).catch(error => {
-                    console.log(error.response);
-                });
+                console.log('Verify success');
+                if(this.state.selectedBank.id == 7){
+                    console.log('Transfer bank 7');
+                    axios.post('http://localhost:8080/client/rsa/recharge', submitTransfer, config).then(response => {
+                        if(response.data.status == "RSA success"){
+                            axios.get('http://localhost:8080/user/byUserId/' + getUserId(), config).then(response => {
+                                console.log(response);
+                                const responseData = {...response.data};
+                                this.setState({loggedAccount: responseData});
+                            }).catch(error=>{
+                                console.log(error);
+                            });
+                            this.setState({showAlert: true, alertMessage: 'Transfer successful'});
+                        }
+                    }).catch(error => {
+                        console.log(error.response);
+                    });
+                }
+
+                if(this.state.selectedBank.id == 8){
+                    console.log('Transfer bank 8');
+                    axios.post('http://localhost:8080/client/pgp2/recharge', submitTransfer2, config).then(response => {
+                        if(response.data.message == "Success"){
+                            axios.get('http://localhost:8080/user/byUserId/' + getUserId(), config).then(response => {
+                                console.log(response);
+                                const responseData = {...response.data};
+                                this.setState({loggedAccount: responseData});
+                            }).catch(error=>{
+                                console.log(error);
+                            });
+                            this.setState({showAlert: true, alertMessage: 'Transfer successful'});
+                        }
+                    }).catch(error => {
+                        console.log(error.response);
+                    });
+                }
+                
             }else{
                 this.setState({showAlert: true, alertMessage: 'OTP not match', showModal: false});
             }
         }).catch((error)=>{
-            console.log(error.response);
+            console.log(error);
             this.setState({showAlert: true, alertMessage: 'Transfer fail', showModal: false});
         });
         
