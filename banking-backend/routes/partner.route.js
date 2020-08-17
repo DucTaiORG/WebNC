@@ -27,11 +27,6 @@ router.get('/history/:id', async (req,res)=>{
     return res.json(list);
 })
 
-router.get('/totalMoney', async(req, res) => {
-    const total_money = await partnerModel.getTotalMoney();
-    return res.json(total_money)
-})
-
 router.post('/filteredDate', async(req, res) => {
     var startDate = req.body.startDate
     var endDate = req.body.endDate

@@ -39,6 +39,7 @@ export default class HistoryAdmin extends Component {
     componentDidMount() {
         const accessToken = localStorage.getItem('accessToken');
         const refreshToken = localStorage.getItem('refreshToken');
+        var total = 0;
 
         const postBody = {
             accessToken,
@@ -71,14 +72,10 @@ export default class HistoryAdmin extends Component {
                     console.log(response);
                     const list = [...response.data];
                     this.setState({ historyArray: list });
-                }).catch(error => {
-                    console.log(error);
-                });
-                axios.get('http://localhost:8080/partner/totalMoney', config).then(response => {
-                    console.log("total", response);
-                    const list = response.data[0].total_money;
-                    console.log("list", list);
-                    this.setState({ total: list });
+                    for(var i = 0; i < list.length; i++){
+                        total += list[i].money_amount;
+                    }
+                    this.setState({total: total});
                 }).catch(error => {
                     console.log(error);
                 });
@@ -89,6 +86,7 @@ export default class HistoryAdmin extends Component {
     }
 
     handleBankSelect = (e) => {
+        var total = 0;
         this.setState({ selectedBank: e });
         const config = {
             headers: {
@@ -100,12 +98,17 @@ export default class HistoryAdmin extends Component {
             console.log(response);
             const list = [...response.data];
             this.setState({ historyArray: list });
+            for(var i = 0; i < list.length; i++){
+                total += list[i].money_amount;
+            }
+            this.setState({total: total});
         }).catch(error => {
             console.log(error);
         });
     }
 
     handleDateSelect = (range) => {
+        var total = 0;
         const config = {
             headers: {
                 'x-access-token': localStorage.getItem('accessToken')
@@ -123,8 +126,12 @@ export default class HistoryAdmin extends Component {
                 const list = [...response.data];
                 console.log(list);
                 this.setState({ historyArray: list });
-            }).catch((error)=>{
-                console.log(error);
+                for(var i = 0; i < list.length; i++){
+                    total += list[i].money_amount;
+                }
+                this.setState({total: total});
+            }).catch(function (error) {
+                console.log(error.response);
             })
         } else{
             axios.get('http://localhost:8080/partner/allBank', config).then(response => {
@@ -144,14 +151,10 @@ export default class HistoryAdmin extends Component {
                     console.log(response);
                     const list = [...response.data];
                     this.setState({ historyArray: list });
-                }).catch(error => {
-                    console.log(error);
-                });
-                axios.get('http://localhost:8080/partner/totalMoney', config).then(response => {
-                    console.log("total", response);
-                    const list = response.data[0].total_money;
-                    console.log("list", list);
-                    this.setState({ total: list });
+                    for(var i = 0; i < list.length; i++){
+                        total += list[i].money_amount;
+                    }
+                    this.setState({total: total});
                 }).catch(error => {
                     console.log(error);
                 });
