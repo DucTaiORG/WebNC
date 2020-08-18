@@ -6,7 +6,19 @@ export default class Receiver extends Component {
     }
 
     render() {
-        if(this.props.obj == null || this.props.obj.fullname.length == 0){
+        if(this.props.obj == null || this.props.obj == undefined){
+            return <tr>
+                <td colSpan='4' style={{textAlign: 'center'}}>
+                No information
+                </td>
+                </tr>
+        }else if(this.props.obj.fullname == undefined){
+            return <tr>
+                <td colSpan='4' style={{textAlign: 'center'}}>
+                No information
+                </td>
+                </tr>
+        }else if(this.props.obj.fullname.length == 0){
             return <tr>
                 <td colSpan='4' style={{textAlign: 'center'}}>
                 No information

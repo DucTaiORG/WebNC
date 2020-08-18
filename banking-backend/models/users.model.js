@@ -144,7 +144,7 @@ const self = module.exports = {
         return db.load(`SELECT deposit_history.money_amount, deposit_history.account_num, deposit_history.time from users 
                             JOIN paymentaccount ON users.id = paymentaccount.userId 
                             JOIN deposit_history ON deposit_history.account_num = paymentaccount.accountNumber
-                                WHERE users.id = ${userId} 
+                                WHERE users.id = ${userId} AND deposit_history.time BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW()
                                     ORDER BY deposit_history.time DESC`);
     },
 
@@ -152,7 +152,7 @@ const self = module.exports = {
         return db.load(`SELECT transfer_history.money_amount, transfer_history.from_account, transfer_history.to_account, transfer_history.time from users 
                             JOIN paymentaccount ON users.id = paymentaccount.userId 
                             JOIN transfer_history ON transfer_history.from_account = paymentaccount.accountNumber OR transfer_history.to_account = paymentaccount.accountNumber
-                                WHERE users.id = ${userId} AND transfer_history.isSuccess = true
+                                WHERE users.id = ${userId} AND transfer_history.isSuccess = true AND transfer_history.time BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW()
                                     ORDER BY transfer_history.time DESC`);
     },
 
@@ -298,7 +298,7 @@ const self = module.exports = {
                             JOIN paymentaccount ON users.id = paymentaccount.userId 
                             JOIN debt ON debt.lender = paymentaccount.accountNumber OR debt.debtor = paymentaccount.accountNumber
                             JOIN pay_debt_history on debt.id = pay_debt_history.debtId
-                                WHERE users.id = ${userId} AND pay_debt_history.isSuccess = true
+                                WHERE users.id = ${userId} AND pay_debt_history.isSuccess = true AND pay_debt_history.time BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW()
                                     ORDER BY pay_debt_history.time DESC`);
     },
 

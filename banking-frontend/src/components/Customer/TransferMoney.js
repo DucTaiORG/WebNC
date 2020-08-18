@@ -96,7 +96,6 @@ export default class TransferMoney extends Component{
 
     handleInputChange = e =>{
         e.preventDefault();
-        console.log("Transfer Input change");
         const {name, value} = e.target;
         let formErrors = this.state.formErrors;
 
@@ -208,7 +207,7 @@ export default class TransferMoney extends Component{
     }
 
     handleItemSelect = (eventKey, event)=>{
-        this.setState({toAccount: eventKey});
+        this.setState({toAccount: eventKey}, ()=>console.log('select account', this.state.toAccount));
         this.setState({selectedName: event.target.textContent});
         const config = {
             headers: {
@@ -218,7 +217,7 @@ export default class TransferMoney extends Component{
 
         axios.get('http://localhost:8080/user/byAccountNum/' + eventKey, config).then(response => {
             const responseData = {...response.data};
-            if(response.data.length > 0){
+            if(!(Object.keys(response).length === 0 && response.constructor === Object > 0)){
                 this.setState({receiver: responseData});
             }
         }).catch(error=>{
@@ -316,7 +315,7 @@ export default class TransferMoney extends Component{
                             </tr>
                         </thead>
                         <tbody>
-                            {this.state.receiver !== null ? <Receiver obj={this.state.receiver}/> : null}
+                            <Receiver obj={this.state.receiver}/>
                         </tbody>
                     </Table>
                     <form onSubmit={this.handleSubmitForm}>
