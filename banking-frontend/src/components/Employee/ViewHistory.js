@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {Table, Dropdown, DropdownButton, Button} from 'react-bootstrap';
 import axios from 'axios';
+import Receiver from './Receiver';
+
 class HistoryRow extends Component{
     render(){
         return(
@@ -83,10 +85,23 @@ export default class ViewHistory extends Component{
                     <Button className="custom-button" variant="danger" onClick={this.handleButtonClick}>Confirm</Button>
                 </div>
                 <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="warning" title="Select Type">
-                    <Dropdown.Item eventKey="Deposit" onSelect={this.handleTypeChange}>Deposit History</Dropdown.Item>
-                    <Dropdown.Item eventKey="Transfer" onSelect={this.handleTypeChange}>Transfer History</Dropdown.Item>
-                    <Dropdown.Item eventKey="Option-3" onSelect={this.handleTypeChange}>Something else</Dropdown.Item>
+                    <Dropdown.Item eventKey="Deposit" onSelect={this.handleTypeChange}>Deposit history</Dropdown.Item>
+                    <Dropdown.Item eventKey="Transfer" onSelect={this.handleTypeChange}>Transfer history</Dropdown.Item>
+                    <Dropdown.Item eventKey="Pay debt" onSelect={this.handleTypeChange}>Pay debt history</Dropdown.Item>
                 </DropdownButton>
+                <Table striped bordered hover style={{marginTopL: 10}}>
+                        <thead>
+                            <tr>
+                                <th>Receiver account number</th>
+                                <th>Full name</th>
+                                <th>Phone number</th>
+                                <th>Date of birth</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <Receiver obj={this.state.receiver}/>
+                        </tbody>
+                    </Table>
                 <span>{this.state.viewType}</span> 
                 <Table striped bordered hover>
                     <thead>

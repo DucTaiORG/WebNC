@@ -15,6 +15,13 @@ export default class TableRow extends Component {
   }
 
   render() {
+    if(this.props.obj == null || this.props.obj == undefined){
+      return <tr>
+              <td colSpan='7' style={{textAlign: 'center'}}>
+                Not thing to show
+              </td>
+            </tr>
+    }
     return (
         <tr>
           <td>

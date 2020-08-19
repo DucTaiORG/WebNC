@@ -55,10 +55,11 @@ export default class Index extends Component {
                     }
                 };
                 axios.get('http://localhost:8080/user/getDebt/' + getUserId(), config).then(response => {
-                    console.log(response.data);
-                    this.setState({debts: response.data});
-                }).catch(function (error) {
-                    console.log(error.response);
+                    const responseData = [...response.data];
+                    console.log(responseData);
+                    this.setState({debts: responseData});
+                }).catch((error) =>{
+                    console.log(error);
                 });
             }
         }).catch((error) => {
