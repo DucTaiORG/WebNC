@@ -11,7 +11,7 @@ export default class Login extends Component {
         this.state = {
             username: '',
             password: '',
-            disableSubmit: false,
+            disableSubmit: true,
             showAlert: false,
             alertMessage: ''
         }
