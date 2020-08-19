@@ -147,8 +147,8 @@ export default class CreateCustomerAccount extends Component{
                     </div>
 
                     <div className="form-group">
-                        <label>Customer name</label>
-                        <input type="text" name="email" value={this.state.email} className="form-control" placeholder="Enter customer name" onChange={this.handleInputChange}/>
+                        <label>Customer email</label>
+                        <input type="email" name="email" value={this.state.email} className="form-control" placeholder="Enter customer email" onChange={this.handleInputChange}/>
                     </div>
 
                     <div className="form-group">
