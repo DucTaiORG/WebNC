@@ -12,7 +12,7 @@ export default class Employee extends Component{
                 <div className="sidenav">
                     <Link to='/employee/create-account'>Create customer account</Link>
                     <hr/>
-                    <Link to="/employee/deposit">Deposit money into account</Link>
+                    <Link to="/employee/deposit">Deposit money</Link>
                     <hr/>
                     <Link to="/employee/view-history">View transaction history</Link>
                 </div>

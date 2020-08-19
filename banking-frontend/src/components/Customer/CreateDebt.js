@@ -49,11 +49,11 @@ export default class CreateDebt extends Component {
             receiverList:[
                 {
                     accountNumber: 123456789,
-                    fullname: 'Tài Đức'
+                    rememberName: 'Tài Đức'
                 },
                 {
                     accountNumber: 112222222,
-                    fullname: 'Bành Thị B'
+                    rememberName: 'Bành Thị B'
                 }
             ],
 
@@ -87,6 +87,15 @@ export default class CreateDebt extends Component {
                     console.log(response);
                     const responseData = {...response.data};
                     this.setState({loggedAccount: responseData});
+                }).catch(error=>{
+                    console.log(error);
+                });
+
+                axios.get('http://localhost:8080/contact/' + getUserId()).then(response => {
+                    const responseData = response.data.slice(0);
+                    this.setState({receiverList: responseData}, ()=>{
+                        console.log(this.state.receiverList);
+                    });
                 }).catch(error=>{
                     console.log(error);
                 });
@@ -284,7 +293,7 @@ export default class CreateDebt extends Component {
                                 <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="warning" title={this.state.selectedName}>
                                     {
                                         this.state.receiverList.map((receiver, index)=>{
-                                            return <Dropdown.Item eventKey={receiver.accountNumber} key={index} onSelect={this.handleItemSelect}>{receiver.fullname}</Dropdown.Item>
+                                            return <Dropdown.Item eventKey={receiver.accountNumber} key={index} onSelect={this.handleItemSelect}>{receiver.rememberName}</Dropdown.Item>
                                         })
                                     }
                                 </DropdownButton>

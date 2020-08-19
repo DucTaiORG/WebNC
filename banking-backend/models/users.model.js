@@ -11,6 +11,9 @@ const self = module.exports = {
     detailByAccNumber: accNo => db.load(`select paymentaccount.accountNumber, users.fullname, users.phoneNo, users.dateOfBirth, users.email
                                 from users join paymentaccount on users.id = paymentaccount.userId  where paymentaccount.accountNumber = ${accNo}`),
 
+    detailByAccNumber2: accNo => db.load(`select users.id, paymentaccount.accountNumber, users.fullname, users.phoneNo, users.dateOfBirth, users.email
+    from users join paymentaccount on users.id = paymentaccount.userId  where paymentaccount.accountNumber = ${accNo}`),
+
     detailByUserId: id => db.load(`select users.id, paymentaccount.accountNumber, users.fullname, users.phoneNo, users.dateOfBirth, users.email
                                     from users join paymentaccount on users.id = paymentaccount.userId  where users.id = ${id}`),
 

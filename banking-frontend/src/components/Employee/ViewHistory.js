@@ -5,11 +5,20 @@ import Receiver from './Receiver';
 
 class HistoryRow extends Component{
     render(){
+        if(this.props.obj == null || this.props.obj == undefined){
+            return <tr>
+                    <td colSpan='5' style={{textAlign: 'center'}}>
+                      Not thing to show
+                    </td>
+                  </tr>
+          }
         return(
             <tr>
                 <td>{this.props.position}</td>
-                <td>{this.props.amount}</td>
-                <td>{this.props.time}</td>
+                <td>{this.props.obj.money_amount}</td>
+                <td>{this.props.obj.from_account || this.props.obj.lender}</td>
+                <td>{this.props.obj.account_num || this.props.obj.to_account || this.props.obj.debtor}</td>
+                <td>{this.props.obj.time}</td>
             </tr>
         )
     }
@@ -24,6 +33,8 @@ export default class ViewHistory extends Component{
             viewType: 'Deposit',
 
             accountNumber: '',
+
+            userInfo:{}
         }
     }
 
@@ -31,6 +42,31 @@ export default class ViewHistory extends Component{
 
     handleTypeChange = (e) => {
         this.setState({viewType: e});
+
+        const config = {
+            headers: {
+                'x-access-token': localStorage.getItem('accessToken')
+            }
+        };
+
+        axios.get('http://localhost:8080/deposit/getUserId/' + this.state.accountNumber, config).then((response)=>{
+            const data = {...response.data};
+            console.log(data.id);
+            const postBody = {
+                userId: data.id
+            };
+            axios.post('http://localhost:8080/deposit/' + e, postBody, config).then((response)=>{
+                console.log(response);
+                const list = [...response.data];
+                this.setState({historyArray: list});
+            }).catch((error)=>{
+                console.log(error.response);
+                alert(error.response.data.error);
+            });
+        }).catch((error)=>{
+            console.log(error);
+            return 0
+        });
     }
 
     handleInputChange = (e) => {
@@ -71,6 +107,14 @@ export default class ViewHistory extends Component{
                     console.log(error.response);
                     alert(error.response.data.error);
                 });
+
+                axios.get('http://localhost:8080/deposit/byAccountNum/' + state.accountNumber, config).then((response)=>{
+                    console.log(response);
+                    const data = {...response.data};
+                    this.setState({userInfo: data});
+                }).catch((error)=>{
+                    console.log(error);
+                });
             }
         }).catch((error) => {
             console.log(error.response);
@@ -84,10 +128,10 @@ export default class ViewHistory extends Component{
                     <input className="custom-input" name="accountNumber" placeholder="Enter account number" onChange={this.handleInputChange}/>
                     <Button className="custom-button" variant="danger" onClick={this.handleButtonClick}>Confirm</Button>
                 </div>
-                <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="warning" title="Select Type">
+                <DropdownButton className="custom-dropdown" id="dropdown-basic-button" variant="warning" title={this.state.viewType}>
                     <Dropdown.Item eventKey="Deposit" onSelect={this.handleTypeChange}>Deposit history</Dropdown.Item>
                     <Dropdown.Item eventKey="Transfer" onSelect={this.handleTypeChange}>Transfer history</Dropdown.Item>
-                    <Dropdown.Item eventKey="Pay debt" onSelect={this.handleTypeChange}>Pay debt history</Dropdown.Item>
+                    <Dropdown.Item eventKey="Debt" onSelect={this.handleTypeChange}>Pay debt history</Dropdown.Item>
                 </DropdownButton>
                 <Table striped bordered hover style={{marginTopL: 10}}>
                         <thead>
@@ -99,22 +143,24 @@ export default class ViewHistory extends Component{
                             </tr>
                         </thead>
                         <tbody>
-                            <Receiver obj={this.state.receiver}/>
+                            <Receiver obj={this.state.userInfo}/>
                         </tbody>
                     </Table>
-                <span>{this.state.viewType}</span> 
                 <Table striped bordered hover>
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Deposit Money</th>
-                            <th>Time</th>
+                            <th>Money Amount</th>
+                            <th>{this.state.historyType == 'paydebtHistory'? 'Lender' : 'From account'}</th>
+                            <th>{this.state.historyType == 'paydebtHistory'? 'Debtor' : 'To account'}</th>
+                            <th>{this.state.historyType == 'paydebtHistory'? 'Pay time' : 'Time'}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
+                            this.state.historyArray.length == 0 ? <HistoryRow amount={null}/>:
                             this.state.historyArray.map((row,index) => (
-                                <HistoryRow position={index + 1} amount={row.money_amount} time={row.time} key={index}/>
+                                <HistoryRow position={index + 1} obj={row} key={index}/>
                             ))
                         }
                     </tbody>
