@@ -41,7 +41,7 @@ app.use('/contact', require('./routes/contact.route'));
 })*/
 
 //api register
-app.post('/user/register', verifyEmployee, async (req, res)=>{
+app.post('/register', verifyEmployee, async (req, res)=>{
     console.log(req.body);
     const rows = await userModel.singleByUserName(req.body.username);
     if(rows.length){

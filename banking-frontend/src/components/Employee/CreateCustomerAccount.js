@@ -52,7 +52,7 @@ export default class CreateCustomerAccount extends Component{
                             'x-access-token' : localStorage.getItem('accessToken')
                         }
                     }
-                    axios.post('http://localhost:8080/user/register', submitForm, config).then(function (response) {
+                    axios.post('http://localhost:8080/register', submitForm, config).then(function (response) {
                         console.log(response.data);
                         alert('Register success');
                     }).catch(function (error){
