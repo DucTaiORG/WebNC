@@ -168,6 +168,7 @@ const self = module.exports = {
             money_amount: money,
             content,
             time: moment().format('YYYY-MM-DD HH:mm:ss'),
+            status: false,
             isActive: true
         }
 

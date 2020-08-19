@@ -228,6 +228,7 @@ export default class Index extends Component {
                     </thead>
                     <tbody>
                     {
+                        this.state.debts.length == 0 ? <TableRow obj={null} handleDel={this.handleDelete} handlePay={this.handlePay}/>:
                         this.state.debts.map((object, index)=>{
                             return <TableRow obj={object} key={index} handleDel={this.handleDelete} handlePay={this.handlePay}/>
                         })
