@@ -42,11 +42,13 @@ router.post('/check', async (req, res)=>{
 
 router.post('/recharge', async (req, res)=>{
     const ts = moment().valueOf();
+    const fromAccount = +req.body.fromAccount || -1;
     const accountNumber = +req.body.toAccount || -1;
     const moneyAmount = +req.body.moneyAmount || 0;
     const sender = +req.body.sender || 0;
     const otpNumber = +req.body.otpNum || 10;
     const body = {
+        "from_account_number": fromAccount,
         "account_number": accountNumber,
         "request_time": ts,
         "amount": moneyAmount

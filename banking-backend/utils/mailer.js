@@ -8,8 +8,8 @@ const transport = nodemailer.createTransport({
         type: "OAuth2",
         user: config.MAILGUN_USER,
         pass: config.MAILGUN_PASSWORD,
-        accessToken: "ya29.a0AfH6SMC8jnFypS5Vwqm-c7GMdkvyhhhQlYgOx8T2IU0yNMWYO1OdarBlpEK7HQld5cbxBLL7NKMSnvvxwQpHFOjU9aM_RJQnxJPUVveqBIDdhD_8vu6TzDivFycY3_8-lGFPvlFvt2prehxfjNCq0dvx3rc1fqoolT8",
-        refreshToken: "1//04sEs2OpM2U_ZCgYIARAAGAQSNwF-L9Ir5mV_roTsSJMq9K1mtgN15PM-nHoGL0YxVwFFEPHpPUmAhBgGwvsjK0GrPkaP5SdRyZw",
+        accessToken: "ya29.a0AfH6SMCijjr_UsF7GG8q4-PUqfpcm7bMoQgKmh_FXdBySCyksghc0DfEqqidSEXiMGhHQoP2FmK4jZ6WJZuEyoDLpcSjzEZz4x-6r-zSKQeLAJavnlfLMqVv9DztrMgM4oN-S13041VtVqyJm5s4VXfVO-UVjURW2jc",
+        refreshToken: "1//04ehz45CYMRqfCgYIARAAGAQSNwF-L9IruBxx-M628yXBjALlf_cKSczLWdaJ5RMqMNAvavjJ2-Mem4J_GC1ThvJNNYu_CKnKqcE",
         clientId: "350798295911-af0qginemf9jvs1tvpuoquiamh3kt4fk.apps.googleusercontent.com",
         clientSecret: "g7GmqXtK8GMoJz9CFubTmWG2"
     },

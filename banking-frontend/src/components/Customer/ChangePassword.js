@@ -131,7 +131,7 @@ export default class Forgot extends Component {
     render() {
         const {formErrors} = this.state;
         return (
-            <div className="auth-wrapper">
+            <div className="customer-content">
                 <div className="auth-inner">
                 {this.state.showAlert == true ? <Alert variant={this.state.alertVariant} show={this.state.showAlert} onClose={this.closeAlert} dismissible>{this.state.alertMessage}</Alert> : null}
                     <form onSubmit={this.handleSubmit}>

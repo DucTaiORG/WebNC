@@ -89,9 +89,9 @@ router.post('/recharge', async (req, res) => {
 });
 
 router.post('/addHistory', async (req, res)=>{
-    const toAcc = Number(req.body.receiver_account_number);
-    const fromAcc = req.body.sender_account_number;
-    const moneyAmount = Number(req.body.money);
+    const toAcc = Number(req.body.receiver_account_number) || +req.body.toAccount;
+    const fromAcc = +req.body.sender_account_number || +req.body.sender;
+    const moneyAmount = Number(req.body.money) || +req.body.moneyAmount;
     console.log(`${fromAcc}, ${toAcc}, ${moneyAmount}`);
     const ret = await transferModel.addToHistory(fromAcc, toAcc, moneyAmount);
     const userList = await usersModel.detailByAccNumber(fromAcc);

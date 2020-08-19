@@ -326,6 +326,7 @@ export default class TransferMoneyExt extends Component{
         }
 
         const submitTransfer2 = {
+            fromAccount: this.state.loggedAccount.accountNumber,
             sender: this.state.loggedAccount.accountNumber,
             toAccount: this.state.toAccount,
             moneyAmount: this.state.moneyAmount,
