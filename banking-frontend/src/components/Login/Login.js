@@ -83,7 +83,7 @@ export default class Login extends Component {
                             </div>
                         </div>
 
-                        {/* <ReCaptcha
+                        {<ReCaptcha
                             ref={(el) => { this.captchaDemo = el; }}
                             size="normal"
                             data-theme="dark"
@@ -91,7 +91,7 @@ export default class Login extends Component {
                             sitekey="6Ldh3KkZAAAAALhoXE8JmLbHjOTANYkzO1S48sRO"
                             onloadCallback={this.onLoadRecaptcha}
                             verifyCallback={this.verifyCallback}
-                        /> */}
+                        />}
 
                         <button disabled={this.state.disableSubmit} type="submit" className="btn btn-primary btn-block">Submit</button>
                         <p className="forgot-password text-right">
