@@ -1,11 +1,11 @@
 const express = require('express');
 const transferModel = require('../models/transferMoney.model');
-const transferModel1 = require('../models/transfer.model');
 const authModel = require('../models/auth.model');
 const moment = require('moment');
 const openpgp = require('openpgp');
 const crypto = require('crypto');
 const config = require('../config/default.json');
+const transferModel2 = require('../models/transfer.model');
 
 const router = express.Router();
 router.get('/', async (req, res) => {
@@ -19,7 +19,7 @@ router.post('/update', async(req, res) => {
     console.log('transfer body: ' + JSON.stringify(req.body));
     const accNum = +req.body.accNum || -1;
     const moneyAmount = +req.body.moneyAmount || -1;
-    if(accNum === -1 || moneyAmount === -1){
+    if(accNum === -1 || moneyAmount === -1 || moneyAmount <= 0){
         return res.status(400).json({
             err: 'Invalid accNum or moneyAmount'
         })
@@ -41,6 +41,7 @@ router.post('/update', async(req, res) => {
         console.log('Response: ' + error);
         return res.status(203).json({error});
     }
+    console.log(`bank: ${bank[0].name}`);
     if(bank[0].secretKey == '30Bank'){
         const encryptedMessage = req.body.message;
         const list = await transferModel.getBalance(accNum);
@@ -49,6 +50,7 @@ router.post('/update', async(req, res) => {
             const publicKeyArmored = bank[0].publicKey;
             if(await decryptedAndVerify(publicKeyArmored, encryptedMessage)){
                 const result = await transferModel.update(Number(moneyAmount) + balance, accNum);
+                await transferModel2.addToHistory(0, accNum, moneyAmount);
                 const currentTime = moment().valueOf();
                 const data = moneyAmount + ', ' + accNum + ', ' + currentTime;
                 console.log(data);
@@ -94,12 +96,13 @@ router.post('/update', async(req, res) => {
         console.log('signature-pgp: ' + JSON.stringify(sigPGP));
         if(await verifyData(publicKeyArmored, sigPGP)){
             const result = await transferModel.update(Number(moneyAmount) + balance, accNum);
+            await transferModel2.addToHistory(0, accNum, moneyAmount);
             const currentTime = moment().valueOf();
             const data = moneyAmount + ', ' + accNum + ', ' + currentTime;
             console.log(data);
             const mySig = await signData(data);
             const partnerId = bank[0].id;
-            const tranferTime = moment(ts).format('YYYY-MM-DD HH:mm:ss');
+            const tranferTime = moment(Number(ts)).format('YYYY-MM-DD HH:mm:ss');
             await transferModel.addToHistory(partnerId, moneyAmount, tranferTime, sigPGP);//Add to history
             console.log("response: success");
             return res.json({
@@ -117,7 +120,7 @@ router.post('/update', async(req, res) => {
         console.log('Response: ' + error);
         return res.json({error});
     }
-});
+})
 
 async function signData(data){
     const privateKeyArmored =  config.privatePGPArmored; // encrypted private key
@@ -135,11 +138,8 @@ async function signData(data){
 
 async function verifyData(publicKeyArmored, sig){
     const realpublicKey = publicKeyArmored.split("\\n").join("\n");
-    console.log(`public key: `);
-    console.log(realpublicKey);
-    const realSignature = sig.split("\\n").join("\n");
-    console.log(`signature: `);
-    console.log(realSignature);
+    const realSignature = sig.split("\\n").join("\r\n");
+    console.log(`signature: ${JSON.stringify(realSignature)}`);
     
     try {
         const verified = await openpgp.verify({
