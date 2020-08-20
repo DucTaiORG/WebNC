@@ -49,7 +49,7 @@ export default class TransferMoneyExt extends Component{
             bankList:[
                 {
                     id: 7,
-                    bankName: 'Nhóm 25'
+                    bankName: 'Nhóm 13'
                 },
                 {
                     id: 8,
@@ -346,7 +346,7 @@ export default class TransferMoneyExt extends Component{
                 if(this.state.selectedBank.id == 7){
                     console.log('Transfer bank 7');
                     axios.post('http://localhost:8080/client/rsa/recharge', submitTransfer, config).then(response => {
-                        if(response.data.status == "RSA success"){
+                        if(response.data.status == "PGP success"){
                             axios.get('http://localhost:8080/user/byUserId/' + getUserId(), config).then(response => {
                                 console.log(response);
                                 const responseData = {...response.data};
